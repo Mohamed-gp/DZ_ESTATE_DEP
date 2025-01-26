@@ -1,0 +1,20 @@
+version: "3.8"
+services:
+  backend:
+    build: ./back-end
+    image: dzEstate-backend-image
+    container_name: dzEstate-backend-container
+    ports:
+      - "3005:3005"
+    restart: always
+    env_file:
+      - back-end/.env
+  frontend:
+    build: ./front-end
+    image: dzEstate-frontend-image
+    container_name: dzEstate-frontend-container
+    ports:
+      - "5005:5005"
+    restart: always
+    env_file:
+      - front-end/.env
