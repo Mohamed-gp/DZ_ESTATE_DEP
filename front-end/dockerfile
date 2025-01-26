@@ -15,14 +15,16 @@ RUN npm ci
 # Step 5: Copy the rest of the app's source code
 COPY . .
 
-# Step 6: Build the React app for production
-RUN npm run build
+# # Step 6: Build the React app for production
+# RUN npm run build
 
 # Step 7: Install a lightweight HTTP server to serve the static files
-RUN npm install -g serve
+# RUN npm install -g serve
 
 # Step 8: Expose the port the app runs on
-EXPOSE 5005
+EXPOSE 4002
 
 # Step 9: Command to serve the app
-CMD ["serve", "-s", "build", "-l", "5005"]
+
+CMD ["npm", "run", "dev"]
+# CMD ["serve", "-s", "build", "-l", "4002"]

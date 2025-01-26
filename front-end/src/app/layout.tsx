@@ -3,9 +3,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import Header from "@/components/header/Header";
 import Footer from "@/components/footer/Footer";
-import AuthProvider from "../../context/AuthContext";
 import { Toaster } from "react-hot-toast";
-import PersistLogin from "./_hooks/PersistLogin";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -22,7 +20,6 @@ export const metadata: Metadata = {
   title: "DZ_Estate",
   description: "1cs project",
 };
-import { appWithTranslation } from "../../i18n";
 export default function RootLayout({
   children,
 }: Readonly<{

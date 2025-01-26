@@ -1,4 +1,4 @@
-import nextI18nConfig from "./next-i18next.config";
+// import nextI18nConfig from "./next-i18next.config";
 import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
  
@@ -11,7 +11,7 @@ const nextConfig: NextConfig = {
           }
         ]
       },
-    ...nextI18nConfig,
+    // ...nextI18nConfig,
     
 };
 
