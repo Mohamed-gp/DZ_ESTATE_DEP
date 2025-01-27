@@ -6,7 +6,7 @@ import axios, {
 } from "axios";
 
 const customAxios: AxiosInstance = axios.create({
-  baseURL: (process.env.NODE_ENV === "production" ? "https://api.letswatchit.live" : "http://localhost:3005") + "/api",
+  baseURL: (process.env.NODE_ENV === "production" ? "https://gl1.production-server.tech" : "http://localhost:3005") + "/api",
   withCredentials: true
 });
 
