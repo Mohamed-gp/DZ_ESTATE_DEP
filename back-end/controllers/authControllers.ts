@@ -216,7 +216,7 @@ const logoutController = async (req: authRequest, res: Response,next: NextFuncti
         process.env.NODE_ENV == "development"
           ? "localhost"
           : "production-server.tech",
-    }).clearCookie("refreshToken", {
+    }).clearCookie("accessToken", {
       httpOnly: true,
       sameSite: "none",
       secure: process.env.NODE_ENV == "development" ? false : true,
