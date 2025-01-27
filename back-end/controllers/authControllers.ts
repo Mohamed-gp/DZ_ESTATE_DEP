@@ -208,7 +208,23 @@ const logoutController = async (req: authRequest, res: Response,next: NextFuncti
       return res.status(401).json({message: "Unauthorized"});
     }
     await pool.query("UPDATE users SET refresh_token = null WHERE id = $1", [userId]);
-    return res.status(200).clearCookie("refreshToken").clearCookie("accessToken").json({message: "Logout successful", data: null});
+    return res.status(200).clearCookie("refreshToken", {
+      httpOnly: true,
+      sameSite: "none",
+      secure: process.env.NODE_ENV == "development" ? false : true,
+      domain:
+        process.env.NODE_ENV == "development"
+          ? "localhost"
+          : "production-server.tech",
+    }).clearCookie("refreshToken", {
+      httpOnly: true,
+      sameSite: "none",
+      secure: process.env.NODE_ENV == "development" ? false : true,
+      domain:
+        process.env.NODE_ENV == "development"
+          ? "localhost"
+          : "production-server.tech",
+    }).clearCookie("accessToken").json({message: "Logout successful", data: null});
   } catch (error) {
     next(error)
   }
