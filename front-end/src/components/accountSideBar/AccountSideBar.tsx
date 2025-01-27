@@ -1,14 +1,7 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import { MdDashboard } from "react-icons/md";
-import {
-  FaBell,
-  FaGear,
-  FaInbox,
-  FaCartShopping,
-  FaFile,
-  FaHeart,
-} from "react-icons/fa6";
+import { FaBell, FaGear, FaInbox, FaFile, FaHeart } from "react-icons/fa6";
 import toast from "react-hot-toast";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa6";
 import { useRouter } from "next/navigation";
@@ -85,9 +78,7 @@ const SideBar = () => {
     },
   ];
 
-  const [activeIndex, setActiveIndex] = useState(
-    menuItems.findIndex((item) => location.pathname === item.link),
-  );
+  const [activeIndex, setActiveIndex] = useState(0);
 
   const toggleSidebar = () => setIsOpen(!isOpen);
   const { setUser } = useBoundStore((state) => state);

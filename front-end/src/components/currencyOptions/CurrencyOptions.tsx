@@ -2,10 +2,10 @@
 import useBoundStore from "@/store/store";
 import { useState, useEffect, useRef } from "react";
 import { FaChevronDown } from "react-icons/fa6";
-import { CURRENCY_LIST } from "@/utils/data";
+import { LANGUAGES_OPTIONS } from "@/utils/data";
 
-const CurrencyOptions = () => {
-  const { currency, changeCurrency } = useBoundStore((state) => state);
+const LanguageOptions = () => {
+  const { language, changeLanguage } = useBoundStore((state) => state);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef(null);
   const buttonRef = useRef(null);
@@ -35,28 +35,28 @@ const CurrencyOptions = () => {
   return (
     <div
       ref={buttonRef}
-      className="relative z-[10] flex cursor-pointer items-center gap-1"
+      className="relative flex cursor-pointer items-center gap-1 z-[10]"
       onClick={() => setIsMenuOpen(!isMenuOpen)}
     >
-      <p>{currency}</p>
+      <p>{language}</p>
       <FaChevronDown className="text-sm" />
       {isMenuOpen && (
         <div
           ref={menuRef}
           className="menu absolute left-0 top-8 rounded-md bg-white p-2 text-black shadow-md"
         >
-          {CURRENCY_LIST.map((option) => (
+          {LANGUAGES_OPTIONS.map((option) => (
             <p
               key={option}
               className="cursor-pointer px-6 py-2 duration-300 hover:bg-blueColor hover:text-white"
               style={
-                option === currency
+                option === language
                   ? { background: "#1563DF", color: "white" }
                   : {}
               }
               onClick={(e) => {
                 e.stopPropagation(); // Prevent event bubbling
-                changeCurrency(option);
+                changeLanguage(option);
                 setIsMenuOpen(false);
               }}
             >
@@ -69,4 +69,4 @@ const CurrencyOptions = () => {
   );
 };
 
-export default CurrencyOptions;
+export default LanguageOptions;

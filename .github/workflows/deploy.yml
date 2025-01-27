@@ -24,6 +24,6 @@ jobs:
           git pull origin main
           npm install --prefix back-end
           npm install --prefix front-end
-          # npm run build --prefix front-end
+          npm run build --prefix front-end
           pm2 restart frontend
           pm2 restart backend

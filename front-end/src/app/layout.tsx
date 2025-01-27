@@ -28,7 +28,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#F2F4F8]`}
+        suppressHydrationWarning
+        className={`${geistSans.variable} ${geistMono.variable} bg-[#F2F4F8] antialiased`}
       >
         <Toaster />
         <Header />

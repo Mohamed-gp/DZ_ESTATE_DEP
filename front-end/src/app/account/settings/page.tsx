@@ -62,14 +62,14 @@ export default function ProfileSettingsPage() {
       <div className="flex flex-col items-center">
         <div className="relative h-24 w-24">
           <Image
-            src={user.profile_image || "/default-profile.png"}
+            src={user?.profile_image}
             alt="Profile"
             className="rounded-full object-cover"
             layout="fill"
           />
         </div>
-        <h2 className="mt-4 text-xl font-semibold">{user.username}</h2>
-        <p className="text-gray-600">{user.role}</p>
+        <h2 className="mt-4 text-xl font-semibold">{user?.username}</h2>
+        <p className="text-gray-600">{user?.role}</p>
       </div>
 
       <div className="mx-auto mt-8">
@@ -81,7 +81,7 @@ export default function ProfileSettingsPage() {
               <label className="block text-sm font-medium text-gray-700">
                 Username
               </label>
-              <p className="font-bold text-gray-800">{user.username}</p>
+              <p className="font-bold text-gray-800">{user?.username}</p>
             </div>
           </div>
           <div className="mb-4 flex items-center">
@@ -90,7 +90,7 @@ export default function ProfileSettingsPage() {
               <label className="block text-sm font-medium text-gray-700">
                 Role
               </label>
-              <p className="font-bold text-gray-800">{user.role}</p>
+              <p className="font-bold text-gray-800">{user?.role}</p>
             </div>
           </div>
           <div className="mb-4 flex items-center">
@@ -99,7 +99,7 @@ export default function ProfileSettingsPage() {
               <label className="block text-sm font-medium text-gray-700">
                 Email
               </label>
-              <p className="font-bold text-gray-800">{user.email}</p>
+              <p className="font-bold text-gray-800">{user?.email}</p>
             </div>
           </div>
           <div className="mb-4 flex items-center">
@@ -108,7 +108,7 @@ export default function ProfileSettingsPage() {
               <label className="block text-sm font-medium text-gray-700">
                 Phone Number
               </label>
-              <p className="font-bold text-gray-800">{user.phone_number}</p>
+              <p className="font-bold text-gray-800">{user?.phone_number}</p>
             </div>
           </div>
         </div>
@@ -170,7 +170,7 @@ export default function ProfileSettingsPage() {
             </Select>
           </div>
         </div>
-        {user.provider == "credentials" && (
+        {user?.provider == "credentials" && (
           <form
             onSubmit={handlePasswordChange}
             className="rounded-lg bg-white p-6 shadow-md"
