@@ -1,8 +1,8 @@
-name: Deploy DZ_ESTATE site to VPS with Docker
+name: Deploy DZ estate App to VPS
 
 on:
   push:
-    branches: [main] # if i enable the pull request the anyone can use the self hosted and do anything including malcious code
+    branches: [main]
   workflow_dispatch: # Enable manual triggering
 
 jobs:
@@ -13,29 +13,17 @@ jobs:
         node-version: [18.x] # Use Node.js 18.x
     steps:
       - uses: actions/checkout@v2
-
-      - name: Set up Docker
-        uses: docker/setup-buildx-action@v2
-
-      - name: Cache Docker layers
-        uses: actions/cache@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
         with:
-          path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-buildx-
-
-      - name: Set up SSH
-        uses: webfactory/ssh-agent@v0.5.3
-        with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-
-      - name: Build Docker image
+          node-version: ${{ matrix.node-version }}
+      - name: Deploy to VPS
         run: |
-          docker-compose build
-      - name: Push Docker image to VPS and deploy
-        run: |
-          cd ${{ secrets.REPO_LOCATION_IN_VPS }} || exit 1
-          git pull origin main || exit 1
-          docker-compose down || exit 1
-          docker-compose up --build -d || exit 1
+          cd /home/mohamed/projects/DZ_ESTATE_DEP
+          git pull origin main
+          npm install --prefix back-end
+          npm install --prefix front-end
+          # npm run build --prefix front-end
+          pm2 restart frontend
+          pm2 restart backend
+
