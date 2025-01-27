@@ -19,6 +19,7 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - name: Deploy to VPS
         run: |
+          export PATH=$PATH:/usr/bin:/bin:/usr/local/bin:/home/linuxbrew/.linuxbrew/bin
           cd /home/mohamed/projects/DZ_ESTATE_DEP
           git pull origin main
           npm install --prefix back-end
@@ -26,4 +27,3 @@ jobs:
           # npm run build --prefix front-end
           pm2 restart frontend
           pm2 restart backend
-
