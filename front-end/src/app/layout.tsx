@@ -37,7 +37,13 @@ export default function RootLayout({
         <StoreProvider>
           <SocketConnectClient />
           <Toaster />
-          <Suspense fallback={<div>Loading...</div>}>
+          <Suspense
+            fallback={
+              <div className="flex h-16 items-center justify-center bg-white shadow-md">
+                <div className="loader h-8 w-8 rounded-full border-4 border-t-4 border-gray-200 ease-linear"></div>
+              </div>
+            }
+          >
             <Header />
           </Suspense>
           {children}

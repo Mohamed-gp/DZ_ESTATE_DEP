@@ -1,6 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import pool from "../config/connectDb";
 import { authRequest } from "../interfaces/authInterface";
+import stripe from "../utils/stripe";
+
 
 const getUserInfo = async (req: Request, res: Response) => {
     const { id } = req.params;
@@ -235,4 +237,4 @@ const getUserProperties = async (req: authRequest, res: Response,next : NextFunc
     }
   };
   
-export { getUserInfo, createUser, updateUser, deleteUser,getUserProperties,getUserPropertiesWishlist ,togglePropertyInWishlist};
+export { getUserInfo, createUser, updateUser, deleteUser,getUserProperties,getUserPropertiesWishlist ,togglePropertyInWishlist,upgradeUserProfile};

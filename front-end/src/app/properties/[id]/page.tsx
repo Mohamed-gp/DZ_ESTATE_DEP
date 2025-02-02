@@ -78,7 +78,7 @@ const SingleProperty = () => {
   }, [state]);
   const messageHouseHandler = async () => {
     try {
-      const { data } = await customAxios.post(`/homes/${property?.id}/chat`);
+      const { data } = await customAxios.post(`/properties/${property?.id}/chat`);
       toast.success(data.message);
     } catch (error) {
       console.log(error);
@@ -279,7 +279,7 @@ const SingleProperty = () => {
                       </div>
                     </div>
                   </div>
-                  {property?.owner?.id != user?.id && user && (
+                  {property?.owner_id != user?.id && user && (
                     <button
                       onClick={() => messageHouseHandler()}
                       className="rounded-xl bg-blueColor px-6 py-2 text-white"
@@ -300,7 +300,7 @@ const SingleProperty = () => {
                 <p className="my-4 border-y-2 border-y-[#4561ec53] py-12">
                   {property?.description}
                 </p>
-                {property.latitude && property.longitude && (
+                {property?.latitude && property?.longitude && (
                   <MapContainer
                     className="z-[500] mx-auto h-[500px] w-[100%]"
                     style={{ width: "100%", height: "500px" }}
@@ -345,7 +345,7 @@ const SingleProperty = () => {
                     <span className="text-xl">{reviews?.length}</span>
                   </div>
 
-                  {property?.owner?.id != user?.id && user && (
+                  {property?.owner_id != user?.id && user && (
                     <>
                       <div className="my-8 mb-4 rounded-lg rounded-t-lg border bg-white px-4 py-2">
                         <textarea
