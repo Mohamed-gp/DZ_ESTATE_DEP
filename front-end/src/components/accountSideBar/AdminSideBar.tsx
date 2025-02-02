@@ -84,6 +84,7 @@ const AdminSideBar = () => {
       link: "/account/inbox",
       icon: FaInbox,
     },
+    { name: "Wishlist", link: "/account/wishlist", icon: FaHeart },
     { name: "Posts", link: "/account/posts", icon: FaFile },
 
     // {

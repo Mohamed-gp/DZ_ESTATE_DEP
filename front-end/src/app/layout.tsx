@@ -6,6 +6,7 @@ import Footer from "@/components/footer/Footer";
 import { Toaster } from "react-hot-toast";
 import { StoreProvider } from "@/providers/storeProvider";
 import SocketConnectClient from "@/components/socketConnectClient/SocketConnectClient";
+import { Suspense } from "react";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -36,7 +37,9 @@ export default function RootLayout({
         <StoreProvider>
           <SocketConnectClient />
           <Toaster />
-          <Header />
+          <Suspense fallback={<div>Loading...</div>}>
+            <Header />
+          </Suspense>
           {children}
           <Footer />
         </StoreProvider>

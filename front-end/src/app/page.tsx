@@ -7,10 +7,13 @@ import PropertyCard from "@/components/propertyCard/PropertyCard";
 import Link from "next/link";
 import PropertiesForRent from "@/components/propertiesForRent/PropertiesForRent";
 import PropertiesForSell from "@/components/propertiesForSell/PropertiesForSell";
+import { Suspense } from 'react'
+
 
 export default function Home() {
   return (
     <>
+      
       <Hero />
       <Publicité />
       {/* <Sponsorisées /> */}

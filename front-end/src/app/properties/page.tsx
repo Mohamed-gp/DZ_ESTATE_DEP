@@ -1,5 +1,5 @@
 "use client";
-import PropertySaleType from "@/components/propertySaleType/PropertySaleType";
+import PropertySaleStatus from "@/components/propertySaleStatus/PropertySaleStatus";
 import CategoriesAndFilterContainer from "@/components/categoriesAndFilterProperties/CategoriesAndFilterContainer";
 import PropertiesAndMapContainer from "@/components/propertiesAndMapContainer/PropertiesAndMapContainer";
 import { useEffect, useState } from "react";
@@ -12,11 +12,11 @@ const Page = () => {
   if (!isMounted) return null;
 
   return (
-    <>
-      <PropertySaleType />
+    <div className="container">
+      <PropertySaleStatus />
       <CategoriesAndFilterContainer />
       <PropertiesAndMapContainer />
-    </>
+    </div>
   );
 };
 

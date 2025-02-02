@@ -1,28 +1,59 @@
 "use client";
-import React, { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
+import customAxios from "@/utils/customAxios";
 import clsx from "clsx";
 
 const Categories = () => {
-  const [selectedCategory, setSelectedCategory] = useState("Modern Villa");
-  const [categories, setCategories] = useState([
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState("");
 
-  ])
+  const getPropertiesCategories = async () => {
+    try {
+      const { data } = await customAxios.get("/categories");
+      setCategories(data.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    getPropertiesCategories();
+    const category = searchParams.get("category");
+    if (category) {
+      setSelectedCategory(category);
+    }
+  }, [searchParams]);
+
+  const selectCategory = (categoryName: string) => {
+    setSelectedCategory(categoryName);
+    const params = new URLSearchParams(window.location.search);
+    if (categoryName) {
+      params.set("category", categoryName);
+    } else {
+      params.delete("category");
+    }
+    router.push(`?${params.toString()}`);
+  };
+
   return (
-    <div className="overflow-x-auto categories flex items-end  flex-1 justify-evenly">
-      {categories.map((category, index) => (
+    <div className="categories flex flex-1 items-end justify-evenly overflow-x-auto">
+      {categories.map((category: any, index) => (
         <div
           key={index}
-          className="flex gap-2  flex-col justify-center  items-center cursor-pointer"
-          onClick={() => setSelectedCategory(category.name)}
+          className="flex cursor-pointer flex-col items-center justify-center gap-2"
+          onClick={() => selectCategory(category?.name)}
         >
           {/* {React.cloneElement(category.iconSVG, {
             fill: selectedCategory === category.name ? "#1563DF" : "#565656",
           })} */}
           <p
             className={clsx(
-              selectedCategory == category.name
-                ? "text-blueColor font-bold"
-                : "text-[#565656]"
+              selectedCategory == category?.name
+                ? "font-bold text-blueColor"
+                : "text-[#565656]",
             )}
           >
             {category.name}

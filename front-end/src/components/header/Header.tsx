@@ -7,9 +7,9 @@ import { FaFacebookF, FaXTwitter } from "react-icons/fa6";
 import { FaLinkedinIn } from "react-icons/fa";
 import { IoMdAddCircleOutline, IoMdOptions } from "react-icons/io";
 import LanguageOptions from "../languageOptions/LanguageOptions";
-import CurrencyOptions from "../currencyOptions/CurrencyOptions";
 import useBoundStore from "@/store/store";
 import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 
 const socialLinks = [
   {
@@ -37,9 +37,23 @@ const socialLinks = [
     id: "instagramId",
   },
 ];
+
 const Header = () => {
   const { user } = useBoundStore((state) => state);
+  const searchParams = useSearchParams();
   const [isMounted, setIsMounted] = useState(false);
+
+  const router = useRouter();
+  const searchHandler = (keyword: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (keyword) {
+      params.set("keyword", keyword);
+    } else {
+      params.delete("keyword");
+    }
+    router.push(`/properties?${params.toString()}`);
+  };
+
   useEffect(() => {
     setIsMounted(true);
   }, []);
@@ -53,7 +67,12 @@ const Header = () => {
             <div className="flex items-center gap-2">
               <p>Follow us:</p>
               {socialLinks.map((socialLink) => (
-                <a key={socialLink.id} href="" target="_blank">
+                <a
+                  key={socialLink.id}
+                  href={socialLink.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   <socialLink.icon className="text-white" />
                 </a>
               ))}
@@ -78,6 +97,8 @@ const Header = () => {
             <div className="flex w-full items-center border bg-white py-2">
               <input
                 type="text"
+                value={searchParams.get("keyword") || ""}
+                onChange={(e) => searchHandler(e.target.value)}
                 className="h-full w-[50%] flex-1 px-4 focus:outline-none"
                 placeholder="Search for anything..."
               />

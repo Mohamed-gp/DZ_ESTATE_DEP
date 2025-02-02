@@ -2,10 +2,13 @@
 import { useEffect, useState } from "react";
 import clsx from "clsx";
 import customAxios from "@/utils/customAxios";
+import { useRouter } from "next/navigation";
 
 const Hero = () => {
-  const [propertySaleType, setPropertySaleType] = useState("all");
+  const [propertySaleStatus, setPropertySaleStatus] = useState("all");
   const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [keyword, setKeyword] = useState("");
 
   const getCategories = async () => {
     try {
@@ -20,6 +23,17 @@ const Hero = () => {
     getCategories();
   }, []);
 
+  const router = useRouter();
+  const searchHandler = () => {
+    const query = new URLSearchParams({
+      status: propertySaleStatus === "all" ? "" : propertySaleStatus,
+      category: selectedCategory,
+      keyword,
+    }).toString();
+
+    router.push(`/properties?${query}`);
+  };
+
   return (
     <div
       className="relative flex min-h-screen flex-col items-center justify-center bg-cover bg-center bg-no-repeat"
@@ -30,7 +44,7 @@ const Hero = () => {
     >
       <div className="absolute left-0 top-0 h-full w-full bg-black opacity-20"></div>
       <div className="relative w-full max-w-3xl px-4">
-        <div className="w-full rounded-lg  bg-opacity-75 p-8">
+        <div className="w-full rounded-lg bg-opacity-75 p-8">
           <h1 className="mb-4 text-center text-4xl font-bold text-white">
             Find Your Perfect Home
           </h1>
@@ -40,34 +54,34 @@ const Hero = () => {
           </p>
           <div className="mb-4 flex justify-center space-x-2">
             <button
-              onClick={() => setPropertySaleType("all")}
+              onClick={() => setPropertySaleStatus("all")}
               className={clsx(
-                propertySaleType === "all"
+                propertySaleStatus === "all"
                   ? "bg-white text-blueColor"
                   : "bg-blueColor text-white",
-                "rounded-md px-4 py-2 font-bold"
+                "rounded-md px-4 py-2 font-bold",
               )}
             >
               All
             </button>
             <button
-              onClick={() => setPropertySaleType("sale")}
+              onClick={() => setPropertySaleStatus("sale")}
               className={clsx(
-                propertySaleType === "sale"
+                propertySaleStatus === "sale"
                   ? "bg-white text-blueColor"
                   : "bg-blueColor text-white",
-                "rounded-md px-4 py-2 font-bold"
+                "rounded-md px-4 py-2 font-bold",
               )}
             >
               Sale
             </button>
             <button
-              onClick={() => setPropertySaleType("rent")}
+              onClick={() => setPropertySaleStatus("rent")}
               className={clsx(
-                propertySaleType === "rent"
+                propertySaleStatus === "rent"
                   ? "bg-white text-blueColor"
                   : "bg-blueColor text-white",
-                "rounded-md px-4 py-2 font-bold"
+                "rounded-md px-4 py-2 font-bold",
               )}
             >
               Rent
@@ -76,18 +90,30 @@ const Hero = () => {
           <div className="mb-4 flex flex-col space-y-4 rounded-md bg-white p-4 md:flex-row md:space-x-4 md:space-y-0">
             <div className="flex flex-1 flex-col">
               <label className="mb-1 text-sm font-semibold">Type</label>
-              <select className="rounded-md border-gray-300 bg-gray-100 px-4 py-2">
-                <option>All Type</option>
-                <option>Rent</option>
-                <option>Sell</option>
+              <select
+                className="rounded-md border-gray-300 bg-gray-100 px-4 py-2"
+                value={propertySaleStatus}
+                onChange={(e) => setPropertySaleStatus(e.target.value)}
+              >
+                <option value="all">All Type</option>
+                <option value="rent">Rent</option>
+                <option value="sale">Sell</option>
               </select>
             </div>
             <div className="flex flex-1 flex-col">
               <label className="mb-1 text-sm font-semibold">Category</label>
-              <select className="rounded-md border-gray-300 bg-gray-100 px-4 py-2">
-                <option disabled>Select Category</option>
+              <select
+                className="rounded-md border-gray-300 bg-gray-100 px-4 py-2"
+                value={selectedCategory}
+                onChange={(e) => {
+                  setSelectedCategory(e.target.value);
+                }}
+              >
+                <option value="" disabled>
+                  Select Category
+                </option>
                 {categories.map((category) => (
-                  <option key={category.id} value={category.id}>
+                  <option key={category.id} value={category.name}>
                     {category.name}
                   </option>
                 ))}
@@ -99,14 +125,16 @@ const Hero = () => {
                 type="text"
                 placeholder="Enter keyword"
                 className="rounded-md border-gray-300 bg-gray-100 px-4 py-2"
+                value={keyword}
+                onChange={(e) => setKeyword(e.target.value)}
               />
             </div>
           </div>
-          <div className="flex  flex-col justify-center space-y-2 md:flex-row md:space-x-2 md:space-y-0">
-            {/* <button className="rounded-md border bg-white px-4 py-2 font-bold duration-300 hover:bg-blueColor hover:text-white">
-              Filter
-            </button> */}
-            <button className="rounded-md bg-blueColor px-4 py-2 font-bold text-white hover:bg-blueColor">
+          <div className="flex flex-col justify-center space-y-2 md:flex-row md:space-x-2 md:space-y-0">
+            <button
+              onClick={searchHandler}
+              className="rounded-md bg-blueColor px-4 py-2 font-bold text-white hover:bg-blueColor"
+            >
               Search
             </button>
           </div>

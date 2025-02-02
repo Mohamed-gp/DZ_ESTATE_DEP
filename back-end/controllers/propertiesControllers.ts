@@ -104,7 +104,7 @@ const addPropertyController = async (req: authRequest, res: Response, next: Next
 
 
 const getProperties = async (req: Request, res: Response) => {
-  let { category, minPrice, maxPrice, page, limit, status } = req.query;
+  let { category, minPrice, maxPrice, page, limit, status, keyword } = req.query;
 
   let query = `
     SELECT 
@@ -151,6 +151,12 @@ const getProperties = async (req: Request, res: Response) => {
     index++;
   }
 
+  if (keyword) {
+    query += ` AND (properties.title ILIKE $${index} OR properties.description ILIKE $${index})`;
+    queryValues.push(`%${keyword}%`);
+    index++;
+  }
+
   query += `
     GROUP BY properties.id, categories.id
   `;
@@ -163,9 +169,6 @@ const getProperties = async (req: Request, res: Response) => {
 
   try {
     const properties = await pool.query(query, queryValues);
-    if (!properties.rows.length) {
-      return res.json({ message: "No property found", data: null });
-    }
     return res.json({ data: properties.rows, message: "Properties fetched successfully" });
   } catch (error) {
     console.error("Error fetching properties:", error);

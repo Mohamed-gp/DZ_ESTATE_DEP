@@ -13,6 +13,7 @@ import { errorHandler, notFound } from "./middlewares/errorHandler";
 import {socketInit} from "./socket/socket" 
 import {createServer} from "http"
 import { ioResponse } from "./interfaces/authInterface";
+import morgan from "morgan"
 
 
 
@@ -27,6 +28,8 @@ connectToDB()
 
 
 export const app = express();
+// Middleware to log all requests
+app.use(morgan('dev'));
 const server = createServer(app);
 
 const io = socketInit(server)
