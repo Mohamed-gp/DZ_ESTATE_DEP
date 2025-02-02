@@ -30,17 +30,17 @@ const Featured = () => {
         <h2 className="mb-8 text-center text-2xl font-bold">
           Featured Categories
         </h2>
-        <div className="flex items-center justify-center gap-4">
+        <div className="flex  items-center justify-center gap-4">
           {categories.map((category: any, ind) => (
             <div
               key={category?.name + ind}
               onClick={() => searchHandler(category?.name)}
-              className="flex h-full flex-1 flex-col items-center justify-end gap-2 rounded-lg bg-white py-6 shadow-md"
+              className="flex h-full cursor-pointer hover:bg-blueColor hover:!text-white duration-300 flex-1 flex-col items-center justify-end gap-2 rounded-lg bg-white py-6 shadow-md"
             >
               {/* {React.cloneElement(category.iconSVG, {
                 fill: "#1563DF",
               })} */}
-              <span className="font-bold text-gray-700">{category?.name}</span>
+              <span className="font-bold text-gray-700 text-inherit">{category?.name}</span>
             </div>
           ))}
         </div>

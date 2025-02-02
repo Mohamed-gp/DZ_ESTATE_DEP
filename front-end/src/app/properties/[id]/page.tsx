@@ -105,7 +105,39 @@ const SingleProperty = () => {
       toast.error(error.response.data.message);
     }
   };
- 
+  const deleteReviewHandler = (id) => {
+    Swal.fire({
+      title: "Are you sure to remove this Review?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const { data } = await customAxios.delete(`/homes/${id}/review`);
+          getHouseReviews();
+          toast.success(data.message);
+          Swal.fire({
+            title: "Deleted!",
+            text: "Review Deleted Successfuly",
+            icon: "success",
+          });
+        } catch (error) {
+          console.log(error);
+          toast.error(error?.response?.data.message);
+        }
+      } else {
+        Swal.fire({
+          title: "your Review is Safe!",
+          text: "something went wrong",
+          icon: "error",
+        });
+      }
+    });
+  };
 
   return (
     <>
@@ -210,58 +242,47 @@ const SingleProperty = () => {
                   <p className="opacity-50">{property?.bathrooms} bathrooms</p>
                 </div>
 
-                <div className="my-6">
-                  <p className="text-2xl font-bold">Seller Profile</p>
-                  <div className="my-4 flex gap-6">
-                    <div className="size-16 overflow-hidden rounded-full">
-                      <img src={property?.owner?.profile_image} alt="" />
-                    </div>
-                    <div className="flex flex-col">
-                      <p className="text-lg font-bold">
-                        {property?.owner?.username}
-                      </p>
-                      <div className="flex gap-4">
-                        <div className="flex items-center gap-1">
-                          <img
-                            src="/phone.svg"
-                            alt="phone.svg"
-                            className="h-[15px] w-[15px]"
-                          />
-                          <div className="flex gap-2 text-lg font-bold">
-                            <p>{property?.owner?.phone_number}</p>
+                <div className="my-6 flex justify-between items-center">
+                  <div>
+                    <p className="text-2xl font-bold">Seller Profile</p>
+                    <div className="my-4 flex gap-6">
+                      <div className="size-16 overflow-hidden rounded-full">
+                        <img src={property?.owner?.profile_image} alt="" />
+                      </div>
+                      <div className="flex flex-col">
+                        <p className="text-lg font-bold">
+                          {property?.owner?.username}
+                        </p>
+                        <div className="flex gap-4">
+                          <div className="flex items-center gap-1">
+                            <img
+                              src="/phone.svg"
+                              alt="phone.svg"
+                              className="h-[15px] w-[15px]"
+                            />
+                            <div className="flex gap-2 text-lg font-bold">
+                              <p>{property?.owner?.phone_number}</p>
+                            </div>
                           </div>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <img
-                            src="/Icon.svg"
-                            alt="Icon.svg"
-                            className="h-[15px] w-[15px]"
-                          />
-                          <div className="flex gap-2 text-lg font-bold">
-                            <p>{property?.owner?.phone_number}</p>
-                            <p>Posts</p>
+                          <div className="flex items-center gap-1">
+                            <img
+                              src="/Icon.svg"
+                              alt="Icon.svg"
+                              className="h-[15px] w-[15px]"
+                            />
+                            <div className="flex gap-2 text-lg font-bold">
+                              <p>{property?.owner?.phone_number}</p>
+                              <p>Posts</p>
+                            </div>
                           </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
-                <div className="my-3 flex flex-wrap items-center justify-center gap-4 sm:justify-normal">
-                  <div className="size-10 overflow-hidden rounded-full">
-                    <img src={property?.owner?.profile_image} alt="" />
-                  </div>
-                  <div className="flex flex-1 flex-col opacity-90">
-                    <p className="text-center sm:text-left">
-                      Hosted by{" "}
-                      <span className="text-center font-bold">
-                        {property?.owner?.username}
-                      </span>
-                    </p>
-                  </div>
                   {property?.owner?.id != user?.id && user && (
                     <button
                       onClick={() => messageHouseHandler()}
-                      className="bg-buttonColor rounded-xl px-6 py-2 text-white"
+                      className="rounded-xl bg-blueColor px-6 py-2 text-white"
                     >
                       Message Host
                     </button>
@@ -269,12 +290,13 @@ const SingleProperty = () => {
                   {!user && (
                     <Link
                       href="/login"
-                      className="bg-buttonColor rounded-xl px-6 py-2 text-white"
+                      className="rounded-xl bg-blueColor px-6 py-2 text-white"
                     >
                       Login First To Be Able To Message The Owner and reserve
                     </Link>
                   )}
                 </div>
+
                 <p className="my-4 border-y-2 border-y-[#4561ec53] py-12">
                   {property?.description}
                 </p>
@@ -364,7 +386,31 @@ const SingleProperty = () => {
                     </>
                   )}
                   <>
-                    
+                    {/* {reviews?.map((review) => (
+                      <div
+                        key={review}
+                        className="my-4 flex flex-col border-y border-y-[#4561ec26] py-4"
+                      >
+                        <div className="my-3 flex items-center gap-2">
+                          <div className="size-10 overflow-hidden rounded-full">
+                            <img src={review?.User?.profileImage} alt="" />
+                          </div>
+                          <div className="gap2 flex flex-1 flex-col opacity-90">
+                            <Rating rating={review?.rating} />
+                            <p>{review?.User?.username}</p>
+                          </div>
+                          {review?.User?.id == user?.id && (
+                            <FaTrash
+                              onClick={() => deleteReviewHandler(review?.id)}
+                              className="cursor-pointer text-red-400"
+                            />
+                          )}
+                        </div>
+                        <p className="break-words rounded-xl bg-white p-2">
+                          {review?.comment}
+                        </p>
+                      </div>
+                    ))} */}
                   </>
                 </div>
               </div>

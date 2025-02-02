@@ -9,6 +9,7 @@ const userRouter = Router();
 
 
 userRouter.route("/wishlist").get(getUserPropertiesWishlist);
+userRouter.route("/upgradeProfile").post()
 userRouter.route("/wishlist/toggle/:propertyId").post(togglePropertyInWishlist);
 
 

@@ -202,5 +202,37 @@ const getUserProperties = async (req: authRequest, res: Response,next : NextFunc
     }
   };
   
+
+
+  
+  const upgradeUserProfile = async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const { paymentMethodId } = req.body;
+  
+    try {
+      // Create a payment intent with Stripe
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: 1000, // Amount in cents (e.g., $10.00)
+        currency: "usd",
+        payment_method: paymentMethodId,
+        confirm: true,
+      });
+  
+      if (paymentIntent.status === "succeeded") {
+        // Mark all properties of the user as sponsored
+        await pool.query(
+          "UPDATE properties SET is_sponsored = true WHERE owner_id = $1",
+          [id]
+        );
+  
+        return res.status(200).json({ message: "Subscription successful and properties sponsored" });
+      } else {
+        return res.status(400).json({ message: "Payment failed" });
+      }
+    } catch (error) {
+      console.error(error);
+      return res.status(500).send("Server error");
+    }
+  };
   
 export { getUserInfo, createUser, updateUser, deleteUser,getUserProperties,getUserPropertiesWishlist ,togglePropertyInWishlist};
