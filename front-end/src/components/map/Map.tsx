@@ -10,8 +10,16 @@ import {
 import "leaflet/dist/leaflet.css";
 import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.webpack.css";
 import "leaflet-defaulticon-compatibility";
+import { useEffect, useState } from "react";
 
 const Map = () => {
+  const [isMounted, setIsMounted] = useState(false);
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+  if (!isMounted) {
+    return null;
+  }
   return (
     <MapContainer
       style={{ width: "400px", height: "650px" }}

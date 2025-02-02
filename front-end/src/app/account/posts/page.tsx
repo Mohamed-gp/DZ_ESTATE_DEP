@@ -88,7 +88,7 @@ export default function PropertiesPage() {
                 </h3>
               </div>
             </Link>
-        
+
             {paginatedProperties?.map((property) => (
               <div key={property.id} className="relative">
                 <PropertyCard property={property} />

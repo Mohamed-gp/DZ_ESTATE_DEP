@@ -1,8 +1,9 @@
+
 import { create } from 'zustand'
 import createAuthSlice,{AuthSliceInterface} from './slices/authSlice'
 import createAppSlice,{AppSliceInterface} from './slices/appSlice'
 
-type RootState = AuthSliceInterface & AppSliceInterface ;
+export type RootState = AuthSliceInterface & AppSliceInterface ;
 // or interface IFooBar extends IFoo, IBar {}
 
 

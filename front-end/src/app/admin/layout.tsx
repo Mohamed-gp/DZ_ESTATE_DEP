@@ -1,9 +1,9 @@
-import SideBarChoice from "@/components/sideBarChoices/SideBarChoice";
+import AdminSideBar from "@/components/accountSideBar/AdminSideBar";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Account",
-  description: "user account info",
+  title: "Admin",
+  description: "admin account info",
 };
 
 export default function RootLayout({
@@ -14,7 +14,7 @@ export default function RootLayout({
   return (
     <>
       <div className="relative flex">
-        <SideBarChoice />
+        <AdminSideBar />
         {children}
       </div>
     </>

@@ -1,17 +1,29 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import { MdDashboard } from "react-icons/md";
-import { FaBell, FaGear, FaInbox, FaFile, FaHeart } from "react-icons/fa6";
+import {
+  FaBell,
+  FaGear,
+  FaInbox,
+  FaFile,
+  FaHeart,
+  FaUsers,
+  FaChartBar,
+  FaTags,
+  FaEnvelope,
+  FaChevronLeft,
+  FaChevronRight,
+} from "react-icons/fa6";
+import { FaEdit, FaListAlt } from "react-icons/fa";
 import toast from "react-hot-toast";
-import { FaChevronLeft, FaChevronRight } from "react-icons/fa6";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import customAxios from "@/utils/customAxios";
 import useBoundStore from "@/store/store";
-import { GiUpgrade } from "react-icons/gi";
 
-const SideBar = () => {
+const AdminSideBar = () => {
   const router = useRouter();
+  const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
@@ -49,11 +61,19 @@ const SideBar = () => {
   }, [isOpen]);
 
   const menuItems = [
-    // {
-    //   name: "Dashboard",
-    //   link: "/account/dashboard",
-    //   icon: MdDashboard,
-    // },
+    { name: "Analytics", link: "/admin/analytics", icon: FaChartBar },
+    { name: "Users", link: "/admin/users", icon: FaUsers },
+
+    {
+      name: "Categories",
+      link: "/admin/categories",
+      icon: FaListAlt,
+    },
+    {
+      name: "Features",
+      link: "/admin/features",
+      icon: FaTags,
+    },
     {
       name: "Notifications",
       link: "/account/notifications",
@@ -65,12 +85,12 @@ const SideBar = () => {
       icon: FaInbox,
     },
     { name: "Posts", link: "/account/posts", icon: FaFile },
-    { name: "Wishlist", link: "/account/wishlist", icon: FaHeart },
-    {
-      name: "Upgrade Profile",
-      link: "/account/upgradeProfile",
-      icon: GiUpgrade,
-    },
+
+    // {
+    //   name: "Edit Properties",
+    //   link: "/admin/edit-properties",
+    //   icon: FaEdit,
+    // },
     {
       name: "Settings",
       link: "/account/settings",
@@ -94,6 +114,11 @@ const SideBar = () => {
       toast.error(err.response?.data?.message || "Logout failed");
     }
   };
+
+  useEffect(() => {
+    const index = menuItems.findIndex((item) => item.link === pathname);
+    setActiveIndex(index);
+  }, [pathname]);
 
   return (
     <>
@@ -162,12 +187,17 @@ const SideBar = () => {
         <button
           ref={buttonRef}
           className="fixed left-full top-1/2 z-50 rounded-full bg-transparent p-2 backdrop-blur-lg focus:outline-none lg:hidden"
-          onClick={toggleSidebar}
         >
           {isOpen ? (
-            <FaChevronLeft className="h-4 w-4 scale-150 transform" /> // Icône de fermeture avec React Icons
+            <FaChevronLeft
+              onClick={toggleSidebar}
+              className="h-4 w-4 scale-150 transform"
+            />
           ) : (
-            <FaChevronRight className="h-4 w-4 scale-150 transform" /> // Icône de menu avec React Icons
+            <FaChevronRight
+              onClick={toggleSidebar}
+              className="h-4 w-4 scale-150 transform"
+            />
           )}
           <span className="sr-only">Toggle Sidebar</span>
         </button>
@@ -176,4 +206,4 @@ const SideBar = () => {
   );
 };
 
-export default SideBar;
+export default AdminSideBar;

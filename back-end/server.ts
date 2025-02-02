@@ -1,19 +1,24 @@
 import dotenv from "dotenv"
 dotenv.config();
-import express,{Response}  from "express"
+import express,{Request,Response,NextFunction}  from "express"
 import {connectToDB} from "./config/connectDb";
 import router from "./routes/index";
 import  cookiesParser from "cookie-parser";
 import cors from "cors";
 import hpp from "hpp";
 import helmet from "helmet";
-import xss from "xss-clean";
+// import xss from "xss-clean";
 import rateLimiting from "express-rate-limit";
-import { socketServer } from "./socket/socket.js";
 import { errorHandler, notFound } from "./middlewares/errorHandler";
+import {socketInit} from "./socket/socket" 
+import {createServer} from "http"
+import { ioResponse } from "./interfaces/authInterface";
 
 
 
+
+
+connectToDB()
 
 
 
@@ -22,12 +27,13 @@ import { errorHandler, notFound } from "./middlewares/errorHandler";
 
 
 export const app = express();
+const server = createServer(app);
 
-// const io = socketServer(server);
-// app.use((req, res, next) => {
-//   res.io = io;
-//   next();
-// });
+const io = socketInit(server)
+app.use((_, res:ioResponse, next:NextFunction) => {
+  res.io = io;
+  next();
+});
 
 app.use(hpp());
 
@@ -35,7 +41,7 @@ app.use(hpp());
 app.use(helmet());
 // // prevent xss attack
 
-app.use(xss());
+// app.use(xss());
 
 app.use(
   rateLimiting({
@@ -43,6 +49,8 @@ app.use(
     max: 500,
   })
 );
+
+
 
 
 
@@ -58,7 +66,6 @@ app.use(cors(corsOptions));
 app.use(cookiesParser());
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
-connectToDB()
 
 
 app.use("/api",router);
@@ -66,7 +73,7 @@ app.use("/api",router);
 app.get('/', (_, res: Response) => {
     res.json({data: 'Hello From DZ ESTATE Server!', status: 200});
 });
-app.listen(PORT, () => {
+server.listen(PORT, () => {
     console.log(`app listening at ${PORT}`);
 });
 

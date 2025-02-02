@@ -43,7 +43,7 @@ const LanguageOptions = () => {
       {isMenuOpen && (
         <div
           ref={menuRef}
-          className="menu absolute left-0 top-8 rounded-md bg-white p-2 text-black shadow-md"
+          className="menu absolute -left-12 top-8 rounded-md bg-white p-2 text-black shadow-md"
         >
           {LANGUAGES_OPTIONS.map((option) => (
             <p

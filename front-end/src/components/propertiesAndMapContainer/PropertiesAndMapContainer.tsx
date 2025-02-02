@@ -1,9 +1,19 @@
-import Map from "../map/Map";
+"use client";
+import { useEffect, useState } from "react";
 import Properties from "../properties/Properties";
+import dynamic from "next/dynamic";
+const Map = dynamic(() => import("../map/Map"), { ssr: false });
 
 const PropertiesAndMapContainer = () => {
+  const [isMounted, setIsMounted] = useState(false);
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+  if (!isMounted) {
+    return null;
+  }
   return (
-    <section className="container mb-24 flex   justify-between sm:flex-row flex-col-reverse items-center sm:items-start gap-12 lg:flex-wrap xl:flex-nowrap">
+    <section className="container mb-24 flex flex-col-reverse items-center justify-between gap-12 sm:flex-row sm:items-start lg:flex-wrap xl:flex-nowrap">
       <Properties />
       <Map />
     </section>

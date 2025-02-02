@@ -1,15 +1,15 @@
 "use client";
-import { FaChevronDown, FaInstagram, FaMagnifyingGlass } from "react-icons/fa6";
+import { FaInstagram, FaMagnifyingGlass } from "react-icons/fa6";
 import Image from "next/image";
 import logo from "../../../public/logo.svg";
 import Link from "next/link";
 import { FaFacebookF, FaXTwitter } from "react-icons/fa6";
 import { FaLinkedinIn } from "react-icons/fa";
 import { IoMdAddCircleOutline, IoMdOptions } from "react-icons/io";
-import { useRouter } from "next/navigation";
 import LanguageOptions from "../languageOptions/LanguageOptions";
 import CurrencyOptions from "../currencyOptions/CurrencyOptions";
 import useBoundStore from "@/store/store";
+import { useEffect, useState } from "react";
 
 const socialLinks = [
   {
@@ -39,11 +39,10 @@ const socialLinks = [
 ];
 const Header = () => {
   const { user } = useBoundStore((state) => state);
-
-  const router = useRouter();
-  const handleClick = () => {
-    router.push("/properties/add");
-  };
+  const [isMounted, setIsMounted] = useState(false);
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   return (
     <header className="flex flex-col">
@@ -63,7 +62,7 @@ const Header = () => {
             <div className="menus flex gap-6">
               <div className="language-menu">
                 <LanguageOptions />
-                <CurrencyOptions />
+                {/* <CurrencyOptions /> */}
               </div>
             </div>
           </div>
@@ -86,39 +85,46 @@ const Header = () => {
             </div>
             <IoMdOptions className="h-[40px] w-[40px] cursor-pointer rounded-sm bg-blueColor p-2 text-xl text-white" />
           </div>
-          {user === null ? (
-            <div className="mx-auto flex items-center gap-2">
-              <Link href={"/auth/login"} className="border px-6 py-2">
-                Login
-              </Link>
-              <Link
-                href={"/auth/register"}
-                className="bg-blueColor px-6 py-2 text-white"
-              >
-                Sign up
-              </Link>
-            </div>
-          ) : (
-            <div className="flex w-[20%] items-center gap-4">
-              <IoMdAddCircleOutline
-                className="size-7 cursor-pointer"
-                onClick={handleClick}
-              />
-              <Link
-                href={"/account/dashboard"}
-                className="relative h-10 w-10 overflow-hidden rounded-full"
-              >
-                <Image
-                  src={user?.profile_image}
-                  alt="Profile picture"
-                  className="rounded-full object-cover"
-                  width={60}
-                  height={60}
-                  // this is really got me confused, why is when i set unoptimized to false, it doesn't work maybe because its external image
-                  unoptimized
-                />
-              </Link>
-            </div>
+          {isMounted && (
+            <>
+              {user === null ? (
+                <div className="mx-auto flex items-center gap-2">
+                  <Link href={"/auth/login"} className="border px-6 py-2">
+                    Login
+                  </Link>
+                  <Link
+                    href={"/auth/register"}
+                    className="bg-blueColor px-6 py-2 text-white"
+                  >
+                    Sign up
+                  </Link>
+                </div>
+              ) : (
+                <div className="flex w-[20%] items-center gap-4">
+                  <Link href={"/properties/add"}>
+                    <IoMdAddCircleOutline className="size-7 cursor-pointer" />
+                  </Link>
+                  <Link
+                    href={
+                      user?.role == "admin"
+                        ? "/admin/analytics"
+                        : "/account/notifications"
+                    }
+                    className="relative h-10 w-10 overflow-hidden rounded-full"
+                  >
+                    <Image
+                      src={user?.profile_image}
+                      alt="Profile picture"
+                      className="rounded-full object-cover"
+                      width={60}
+                      height={60}
+                      // this is really got me confused, why is when i set unoptimized to false, it doesn't work maybe because its external image
+                      unoptimized
+                    />
+                  </Link>
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>
