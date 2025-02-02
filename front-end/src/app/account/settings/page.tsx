@@ -148,7 +148,7 @@ export default function ProfileSettingsPage() {
               </SelectContent>
             </Select>
           </div>
-          <div className="mb-4">
+          {/* <div className="mb-4">
             <label className="flex items-center text-sm font-medium text-gray-700">
               <DollarSign className="mr-2 text-gray-500" />
               Currency
@@ -168,7 +168,7 @@ export default function ProfileSettingsPage() {
                 ))}
               </SelectContent>
             </Select>
-          </div>
+          </div> */}
         </div>
         {user?.provider == "credentials" && (
           <form
