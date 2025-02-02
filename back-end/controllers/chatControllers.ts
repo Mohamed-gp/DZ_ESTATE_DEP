@@ -1,9 +1,53 @@
 import { Request, Response, NextFunction } from "express";
 import pool from "../config/connectDb";
-import { Server } from "socket.io";
+import { ioResponse } from "../interfaces/authInterface";
 
 
 
+
+
+const createRoomController = async (req: Request, res: Response, next: NextFunction) => {
+  const { propertyId, firstUserId} = req.body;
+
+  try {
+    // Retrieve the property details
+    const propertyResult = await pool.query(
+      "SELECT p.title, p.owner_id, pa.asset_url AS image FROM properties p LEFT JOIN property_assets pa ON p.id = pa.property_id WHERE p.id = $1 AND pa.type = 'image' LIMIT 1",
+      [propertyId]
+    );
+
+    if (propertyResult.rows.length === 0) {
+      return res.status(404).json({ message: "Property not found" });
+    }
+
+    const property = propertyResult.rows[0];
+
+    // Retrieve the owner details
+    const ownerResult = await pool.query(
+      "SELECT username FROM users WHERE id = $1",
+      [property.owner_id]
+    );
+
+    if (ownerResult.rows.length === 0) {
+      return res.status(404).json({ message: "Owner not found" });
+    }
+
+    const owner = ownerResult.rows[0];
+
+    // Create a new chat room
+    const roomResult = await pool.query(
+      "INSERT INTO rooms (user1_id, user2_id, picture, created_at) VALUES ($1, $2, $3, CURRENT_TIMESTAMP) RETURNING *",
+      [firstUserId, property.owner_id, property.image]
+    );
+
+    const room = roomResult.rows[0];
+
+    return res.status(201).json({ message: "Room created successfully", room });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send("Server error");
+  }
+};
 
 /**
  * @method POST
@@ -11,7 +55,7 @@ import { Server } from "socket.io";
  * @description Send a message in a chat
  * @route /api/messages/send
  */
-const sendMessageController = async (req: Request, res: Response, next: NextFunction) => {
+const sendMessageController = async (req: Request, res: ioResponse, next: NextFunction) => {
     
   const { chat_id, user_id, message } = req.body;
 
@@ -27,8 +71,7 @@ const sendMessageController = async (req: Request, res: Response, next: NextFunc
     );
 
     // Emit the message to the chat room using Socket.IO
-    const io: Server = req.app.get("io"); // Assuming you've attached io to the app instance
-    io.to(chat_id).emit("new_message", newMessage.rows[0]);
+    res.io.to(chat_id).emit("new_message", newMessage.rows[0]);
 
     res.status(201).json({ message: "Message sent successfully.", data: newMessage.rows[0] });
   } catch (err) {
@@ -57,9 +100,9 @@ const getMessagesController = async (req: Request, res: Response, next: NextFunc
       [chat_id]
     );
 
-    res.status(200).json({ data: messages.rows });
+    res.status(200).json({ data: messages.rows,message : "Messages fetched successfully." });
   } catch (err) {
-    console.error("Error in getMessagesController:", err.message);
+    console.log("Error in getMessagesController:", err.message);
     next(err);
   }
 };
@@ -94,7 +137,7 @@ const getUserConversationsController = async (
         [user_id]
       );
   
-      res.status(200).json({ data: conversations.rows });
+      res.status(200).json({ data: conversations.rows,message : "Conversations fetched successfully." });
     } catch (err) {
       console.error("Error in getUserConversationsController:", err.message);
       next(err);
