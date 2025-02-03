@@ -112,7 +112,7 @@ const PropertyCard = ({ property }: PropertyCardProps) => {
             className={`h-5 w-5 duration-300 hover:fill-red-500 hover:text-red-500 ${property.isFavorite ? "fill-red-500 text-red-500" : "text-gray-600"}`}
           />
         </button>
-        {property?.owner_id == user.id && (
+        {property?.owner_id == user?.id && (
           <button
             onClick={() => removeHandler(property.id)}
             className="absolute right-14 top-3 z-10 rounded-full bg-white/90 p-2 shadow-md transition-all hover:scale-110 hover:bg-white"
@@ -124,7 +124,7 @@ const PropertyCard = ({ property }: PropertyCardProps) => {
         <div
           className={`absolute left-3 top-3 z-10 rounded-full px-3 py-1 text-sm font-medium ${statusColor} `}
         >
-          {property.status}
+          {property?.status}
         </div>
       </div>
 
@@ -132,7 +132,7 @@ const PropertyCard = ({ property }: PropertyCardProps) => {
       <div className="p-4">
         <div className="mb-3">
           <h2 className="mb-1 text-xl font-bold text-gray-900">
-            {property.title}
+            {property?.title}
           </h2>
           <p className="text-sm text-gray-600">{property?.address}</p>
         </div>

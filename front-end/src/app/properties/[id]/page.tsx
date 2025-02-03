@@ -78,7 +78,9 @@ const SingleProperty = () => {
   }, [state]);
   const messageHouseHandler = async () => {
     try {
-      const { data } = await customAxios.post(`/properties/${property?.id}/chat`);
+      const { data } = await customAxios.post(
+        `/properties/${property?.id}/chat`,
+      );
       toast.success(data.message);
     } catch (error) {
       console.log(error);
@@ -242,7 +244,7 @@ const SingleProperty = () => {
                   <p className="opacity-50">{property?.bathrooms} bathrooms</p>
                 </div>
 
-                <div className="my-6 flex justify-between items-center">
+                <div className="my-6 flex items-center justify-between">
                   <div>
                     <p className="text-2xl font-bold">Seller Profile</p>
                     <div className="my-4 flex gap-6">
@@ -289,7 +291,7 @@ const SingleProperty = () => {
                   )}
                   {!user && (
                     <Link
-                      href="/login"
+                      href="/auth/login"
                       className="rounded-xl bg-blueColor px-6 py-2 text-white"
                     >
                       Login First To Be Able To Message The Owner and reserve

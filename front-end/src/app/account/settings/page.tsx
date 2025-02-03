@@ -23,11 +23,12 @@ import {
   Globe,
   DollarSign,
 } from "lucide-react";
-import { CURRENCY_LIST, LANGUAGES_OPTIONS } from "@/utils/data";
+import { LANGUAGES_OPTIONS } from "@/utils/data";
 
 export default function ProfileSettingsPage() {
-  const { user, currency, language, changeCurrency, changeLanguage } =
-    useBoundStore((state) => state);
+  const { user, language, changeLanguage, setUser } = useBoundStore(
+    (state) => state,
+  );
   const [darkTheme, setDarkTheme] = useState(false);
 
   const handlePasswordChange = async (e: React.FormEvent) => {
@@ -35,19 +36,22 @@ export default function ProfileSettingsPage() {
     const formData = new FormData(e.target as HTMLFormElement);
     const currentPassword = formData.get("currentPassword") as string;
     const newPassword = formData.get("newPassword") as string;
-    const confirmPassword = formData.get("confirmPassword") as string;
+    const confirmNewPassword = formData.get("confirmNewPassword") as string;
+    console.log(currentPassword, newPassword, confirmNewPassword);
 
-    if (newPassword !== confirmPassword) {
+    if (newPassword !== confirmNewPassword) {
       toast.error("Passwords do not match");
       return;
     }
 
     try {
-      await customAxios.put(`/users/${user?.id}/password`, {
+      const { data } = await customAxios.put(`/auth/changepassword`, {
         currentPassword,
         newPassword,
+        confirmNewPassword,
       });
-      toast.success("Password updated successfully");
+      setUser(data.data);
+      toast.success(data.message);
     } catch (error) {
       toast.error(error.response.data.message);
     }
@@ -108,7 +112,13 @@ export default function ProfileSettingsPage() {
               <label className="block text-sm font-medium text-gray-700">
                 Phone Number
               </label>
-              <p className="font-bold text-gray-800">{user?.phone_number}</p>
+              {user?.phone_number == null ? (
+                <p className="font-bold text-gray-800">
+                  (You didn&apos;t put any phone number)
+                </p>
+              ) : (
+                <p className="font-bold text-gray-800">{user?.phone_number}</p>
+              )}
             </div>
           </div>
         </div>
@@ -215,8 +225,8 @@ export default function ProfileSettingsPage() {
               </label>
               <Input
                 type="password"
-                name="confirmPassword"
-                id="confirmPassword"
+                name="confirmNewPassword"
+                id="confirmNewPassword"
                 required
                 className="mt-1 block w-full focus-visible:ring-transparent"
               />

@@ -1,7 +1,15 @@
-import Image from "next/image";
-import toast from "react";
+"use client";
+import { FaGoogle } from "react-icons/fa";
+import { app } from "@/utils/fireBase";
+import useBoundStore from "../../store/store";
+import { GoogleAuthProvider, getAuth, signInWithPopup } from "firebase/auth";
+import toast from "react-hot-toast";
+import customAxios from "@/utils/customAxios";
+import { useRouter } from "next/navigation";
 
 const GoogleSignIn = () => {
+  const { setUser } = useBoundStore();
+  const router = useRouter();
   const handleGoogleSignIn = async () => {
     try {
       const provider = new GoogleAuthProvider();
@@ -15,19 +23,20 @@ const GoogleSignIn = () => {
       });
 
       toast.success(data.message);
-      dispatch(authActions.login(data.data));
+      setUser(data.data);
+      router.push("/");
     } catch (error) {
       console.log(error);
     }
   };
   return (
     <button
+      onClick={handleGoogleSignIn}
       type="button"
-      onClick={() => handleGoogleSignIn()}
-      className="text-mainColor my-2 flex w-full justify-center gap-2 border-2 border-[#0F62FE] py-2 text-[#0F62FE]"
+      className="order-5 flex h-full w-[100%] flex-grow-0 flex-row items-center justify-center self-stretch rounded-lg border-2 border-[#0F62FE] px-4 py-2 text-base text-[#0F62FE]"
     >
-      <Image src="/googleLogo.svg" alt="google" width={20} height={20} />
-      <p className="text-primaryColor">Continue With Google</p>
+      <FaGoogle />
+      log in with Google
     </button>
   );
 };

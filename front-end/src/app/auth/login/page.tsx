@@ -1,13 +1,12 @@
 "use client";
 import z from "zod";
 import Link from "next/link";
-import { FaGoogle } from "react-icons/fa";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import customAxios from "@/utils/customAxios";
 import useBoundStore from "@/store/store";
-import axios from "axios";
+import GoogleSignIn from "@/components/googleSignInButton/GoogleSignInButton";
 
 const Page = () => {
   const { user, setUser } = useBoundStore((state) => state);
@@ -88,13 +87,7 @@ const Page = () => {
 
         <div className="my-4 flex w-full flex-col items-center justify-center border-y">
           <p className="m-2 text-base">Or log in with :</p>
-          <button
-            type="button"
-            className="order-5 flex h-full w-[100%] flex-grow-0 flex-row items-center justify-center self-stretch rounded-lg border-2 border-[#0F62FE] px-4 py-2 text-base text-[#0F62FE]"
-          >
-            <FaGoogle />
-            log in with Google
-          </button>
+          <GoogleSignIn />
         </div>
 
         <Link href="/auth/register" className="text-[#001D6C]">

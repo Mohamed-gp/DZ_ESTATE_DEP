@@ -11,7 +11,7 @@ import {
   Folder,
 } from "lucide-react";
 import customAxios from "@/utils/customAxios";
-// import AddLocationInput from "@/components/addProperty/AddLocationInput";
+import dynamic from "next/dynamic";
 import toast from "react-hot-toast";
 import AddPropertyImages from "@/components/addProperty/AddPropertyImages";
 
@@ -27,11 +27,18 @@ interface PropertyFormData {
   bedrooms: number;
   bathrooms: number;
   files: [];
+  features: string[];
   wilaya: number;
   commune: string;
   quartier: string;
 }
 
+const AddLocationInput = dynamic(
+  () => import("@/components/addProperty/AddLocationInput"),
+  {
+    ssr: false,
+  },
+);
 const PropertyForm = () => {
   const [dataToSubmit, setDataToSubmit] = useState<PropertyFormData>({
     title: "",
@@ -47,13 +54,13 @@ const PropertyForm = () => {
     guests: 0,
     bedrooms: 0,
     bathrooms: 0,
+    features: [],
     files: [],
   });
 
   const submitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      console.log(dataToSubmit);
       const formData = new FormData();
       formData.append("title", dataToSubmit.title);
       formData.append("status", dataToSubmit.status);
@@ -74,28 +81,41 @@ const PropertyForm = () => {
           formData.append("files", dataToSubmit.files[i]);
         }
       }
+
+      if (dataToSubmit.features && dataToSubmit.features?.length > 0) {
+        for (let i = 0; i < dataToSubmit.features.length; i++) {
+          formData.append("features", dataToSubmit.features[i]);
+        }
+      }
       const { data } = await customAxios.post("/properties/add", formData);
       toast.success(data.message);
     } catch (error) {
-      console.log(error)
-      // toast.error(error.response.data.message);
-      // console.error(error);
+      console.log(error);
     }
   };
-  const [categories, setCategories] = useState([
-    { name: "Beach", _id: "1" },
-    { name: "Countryside", _id: "2" },
-  ]);
+  const [categories, setCategories] = useState([]);
   const getPropertiesCategories = async () => {
     try {
-      const { data } = await customAxios.get("/properties/categories");
-      setCategories(data);
+      const { data } = await customAxios.get(`/categories`);
+      setCategories(data.data);
+      console.log(data.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const [features, setFeatures] = useState([]);
+  const getPropertiesFeatures = async () => {
+    try {
+      const { data } = await customAxios.get(`/features`);
+      setFeatures(data.data);
+      console.log(data.data);
     } catch (error) {
       console.log(error);
     }
   };
   useEffect(() => {
-    // getPropertiesCategories();
+    getPropertiesCategories();
+    getPropertiesFeatures();
   }, []);
 
   return (
@@ -173,8 +193,8 @@ const PropertyForm = () => {
                     });
                   }}
                 >
-                  {categories.map((category) => (
-                    <option key={category._id} value={category.name}>
+                  {categories?.map((category) => (
+                    <option key={category.id} value={category.name}>
                       {category.name}
                     </option>
                   ))}
@@ -245,11 +265,11 @@ const PropertyForm = () => {
           </div>
 
           {/* localistaion via google map  */}
-          {/* <AddLocationInput
+          <AddLocationInput
             dataToSubmit={dataToSubmit}
             setDataToSubmit={setDataToSubmit}
             inputLabel="location"
-          /> */}
+          />
 
           {/* Property Details */}
           <div className="space-y-6 rounded-lg bg-gray-50 p-6">
@@ -351,38 +371,46 @@ const PropertyForm = () => {
               <ImagePlus className="h-4 w-4 text-blue-600" />
               Property Images
             </label>
-            {/* <div className="rounded-lg border-2 border-dashed border-gray-300 p-6 text-center">
-              <input
-                type="file"
-                className="hidden"
-                id="images"
-                multiple
-                onChange={(e) => {
-                  if (e.target.files) {
-                    setDataToSubmit({
-                      ...dataToSubmit,
-                      files: e.target.files,
-                    });
-                    handleImageChange(e);
-                  }
-                }}
-              />
-              <label htmlFor="images" className="cursor-pointer">
-                <div className="space-y-2">
-                  <ImagePlus className="mx-auto h-12 w-12 text-gray-400" />
-                  <p className="text-sm text-gray-600">
-                    Click to upload images
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    PNG, JPG, GIF up to 10MB
-                  </p>
-                </div>
-              </label>
-            </div> */}
+
             <AddPropertyImages
               dataToSubmit={dataToSubmit}
               setDataToSubmit={setDataToSubmit}
             />
+          </div>
+          {/* Property Features */}
+          <div className="space-y-6 rounded-lg bg-gray-50 p-6">
+            <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+              <ImagePlus className="h-4 w-4 text-blue-600" />
+              Property Features
+            </label>
+            <div className="flex flex-wrap justify-center gap-8">
+              {features?.map((feature: any) => (
+                <div key={feature?.id} className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    className="rounded-lg border border-gray-300 bg-white p-3 transition-all focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setDataToSubmit({
+                          ...dataToSubmit,
+                          features: [...dataToSubmit?.features, feature?.id],
+                        });
+                      } else {
+                        setDataToSubmit({
+                          ...dataToSubmit,
+                          features: dataToSubmit.features.filter(
+                            (id) => id !== feature.id,
+                          ),
+                        });
+                      }
+                    }}
+                    id={feature?.id}
+                    value={feature?.title}
+                  />
+                  <label htmlFor={feature?.id}>{feature?.title}</label>
+                </div>
+              ))}
+            </div>
           </div>
 
           {/* Submit Button */}

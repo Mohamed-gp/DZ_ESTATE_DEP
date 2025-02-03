@@ -7,15 +7,17 @@ import { getAnalytics } from "firebase/analytics";
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_KEY,
-  authDomain: "swiftbuy-e0bf2.firebaseapp.com",
-  projectId: "swiftbuy-e0bf2",
-  storageBucket: "swiftbuy-e0bf2.appspot.com",
-  messagingSenderId: "519202175438",
-  appId: "1:519202175438:web:61d4526dd74444efe1939f",
-  measurementId: "G-STL5Y2HXZK",
+  apiKey: "AIzaSyCW_XKJj_LI106mdskNOCvk3EReSsZEpW0",
+  authDomain: "dz-estate-bd932.firebaseapp.com",
+  projectId: "dz-estate-bd932",
+  storageBucket: "dz-estate-bd932.firebasestorage.app",
+  messagingSenderId: "457851364158",
+  appId: "1:457851364158:web:7d1262073d2703bb7e426f",
+  measurementId: "G-89KX5PZ388"
 };
 
 // Initialize Firebase
-export const app = initializeApp(firebaseConfig);
-export const analytics = getAnalytics(app);
+const app = initializeApp(firebaseConfig);
+// const analytics = getAnalytics(app);
+
+export {app}

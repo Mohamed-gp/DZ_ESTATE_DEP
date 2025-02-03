@@ -14,7 +14,7 @@ import {socketInit} from "./socket/socket"
 import {createServer} from "http"
 import { ioResponse } from "./interfaces/authInterface";
 import morgan from "morgan"
-
+import session from "express-session"
 
 
 
@@ -46,12 +46,12 @@ app.use(helmet());
 
 // app.use(xss());
 
-app.use(
-  rateLimiting({
-    windowMs: 10 * 60 * 1000,
-    max: 500,
-  })
-);
+// app.use(
+//   rateLimiting({
+//     windowMs: 10 * 60 * 1000,
+//     max: 500,
+//   })
+// );
 
 
 

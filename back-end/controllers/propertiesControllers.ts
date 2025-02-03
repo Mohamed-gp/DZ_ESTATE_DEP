@@ -25,8 +25,6 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
 
 const addPropertyController = async (req: authRequest, res: Response, next: NextFunction) => {
   try {
-    console.log(req.user.id);
-
     const { error } = validateCreateProperty(req.body);
     if (error) {
       return res.status(400).json({
@@ -35,8 +33,9 @@ const addPropertyController = async (req: authRequest, res: Response, next: Next
       });
     }
 
-    const { title, description, price, status, commune, quartier, wilaya, longitude, latitude, guests, bedrooms, bathrooms, category } = req.body;
-
+    const { title, description, price, status, commune, quartier, wilaya, longitude, latitude, guests, bedrooms, bathrooms, category,features } = req.body;
+    console.log(features);
+    return ;
     const files = req.files as Express.Multer.File[];
 
     // Vérifier le nombre minimum de fichiers (images ou vidéos)

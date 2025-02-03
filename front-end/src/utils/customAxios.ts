@@ -15,12 +15,17 @@ customAxios.interceptors.response.use(
   async (error: AxiosError) => {
     const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
 
-    if (error.response?.status === 403 && !originalRequest._retry) {
+    if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
       try {
         // Attempt to refresh token
-        await customAxios.post("/auth/refreshToken");
+        const {data} = await customAxios.post("/auth/refreshToken");
+        if(data.message == "Invalid refresh token. Please log in again."){
+          localStorage.removeItem("user");
+          toast.error("Invalid token login again");
+          window.location.href = '/auth/login';
+        }
 
         // Retry original request with new token
         return customAxios(originalRequest);
