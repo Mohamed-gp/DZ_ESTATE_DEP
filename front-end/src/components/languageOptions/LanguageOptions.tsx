@@ -1,72 +1,53 @@
-"use client";
-import useBoundStore from "@/store/store";
-import { useState, useEffect, useRef } from "react";
-import { FaChevronDown } from "react-icons/fa6";
-import { LANGUAGES_OPTIONS } from "@/utils/data";
+'use client';
 
-const LanguageOptions = () => {
-  const { language, changeLanguage } = useBoundStore((state) => state);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const menuRef = useRef(null);
-  const buttonRef = useRef(null);
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { IoIosArrowDown } from 'react-icons/io';
 
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (
-        menuRef.current &&
-        !menuRef.current.contains(event.target) &&
-        !buttonRef.current.contains(event.target)
-      ) {
-        setIsMenuOpen(false);
-      }
-    };
 
-    // Add event listener when menu is open
-    if (isMenuOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
+export  default function LanguageOptions() {
+  const { i18n, t } = useTranslation();
+  const [isOpen, setIsOpen] = useState(false);
 
-    // Cleanup listener
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [isMenuOpen]);
+  const languages = [
+    { code: 'en', name: t('language.en') },
+    { code: 'ar', name: t('language.ar') },
+    { code: 'fr', name: t('language.fr') }
+  ];
+
+  const changeLanguage = (lng: string) => {
+    i18n.changeLanguage(lng);
+    localStorage.setItem('language', lng);
+    setIsOpen(false);
+  };
+
+  const currentLanguage = languages.find(lang => lang.code === i18n.language);
 
   return (
-    <div
-      ref={buttonRef}
-      className="relative flex cursor-pointer items-center gap-1 z-[10]"
-      onClick={() => setIsMenuOpen(!isMenuOpen)}
-    >
-      <p>{language}</p>
-      <FaChevronDown className="text-sm" />
-      {isMenuOpen && (
-        <div
-          ref={menuRef}
-          className="menu absolute -left-12 top-8 rounded-md bg-white p-2 text-black shadow-md"
-        >
-          {LANGUAGES_OPTIONS.map((option) => (
-            <p
-              key={option}
-              className="cursor-pointer px-6 py-2 duration-300 hover:bg-blueColor hover:text-white"
-              style={
-                option === language
-                  ? { background: "#1563DF", color: "white" }
-                  : {}
-              }
-              onClick={(e) => {
-                e.stopPropagation(); // Prevent event bubbling
-                changeLanguage(option);
-                setIsMenuOpen(false);
-              }}
+    <div className="relative">
+      <div 
+        onClick={() => setIsOpen(!isOpen)} 
+        className="flex cursor-pointer items-center gap-2"
+      >
+        {currentLanguage?.name}
+        <IoIosArrowDown />
+      </div>
+      {isOpen && (
+        <div className="absolute right-0 top-full z-10 mt-2 w-32 rounded-md bg-white shadow-lg">
+          {languages.map((lang) => (
+            <div
+              key={lang.code}
+              onClick={() => changeLanguage(lang.code)}
+              className={`
+                cursor-pointer px-4 py-2 
+                ${i18n.language === lang.code ? 'bg-blueColor text-white' : 'hover:bg-gray-100'}
+              `}
             >
-              {option}
-            </p>
+              {lang.name}
+            </div>
           ))}
         </div>
       )}
     </div>
   );
-};
-
-export default LanguageOptions;
+}

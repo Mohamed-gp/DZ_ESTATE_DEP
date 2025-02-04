@@ -112,7 +112,7 @@ const PropertyCard = ({ property }: PropertyCardProps) => {
             className={`h-5 w-5 duration-300 hover:fill-red-500 hover:text-red-500 ${property.isFavorite ? "fill-red-500 text-red-500" : "text-gray-600"}`}
           />
         </button>
-        {property?.owner_id == user.id && (
+        {property?.owner_id == user?.id && (
           <button
             onClick={() => removeHandler(property.id)}
             className="absolute right-14 top-3 z-10 rounded-full bg-white/90 p-2 shadow-md transition-all hover:scale-110 hover:bg-white"

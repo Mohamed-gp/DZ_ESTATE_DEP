@@ -1,7 +1,10 @@
+'use client'
 import Link from "next/link";
 import Image from "next/image";
 import { FaFacebookF, FaXTwitter, FaInstagram } from "react-icons/fa6";
 import { FaLinkedinIn } from "react-icons/fa";
+import { useTranslation } from 'react-i18next';
+
 const socialLinks = [
   {
     name: "LinkedIn",
@@ -31,22 +34,22 @@ const socialLinks = [
 
 const usefulLinks = [
   {
-    name: "Hero",
+    name: "heroLink",
     link: "#hero",
     id: "heroLinkId",
   },
   {
-    name: "About Us",
+    name: "aboutUsLink",
     link: "#aboutUs",
-    id: "abousUsLinkId",
+    id: "aboutUsLinkId",
   },
   {
-    name: "Features",
+    name: "featuresLink",
     link: "#features",
     id: "featuresLinkId",
   },
   {
-    name: "Contact Us",
+    name: "contactUsLink",
     link: "#contactUs",
     id: "contactUsLinkId",
   },
@@ -54,24 +57,27 @@ const usefulLinks = [
 
 const pagesLink = [
   {
-    name: "Home",
+    name: "homeLink",
     link: "/",
     id: "homeLinkId",
   },
   {
-    name: "Properties",
+    name: "propertiesLink",
     link: "/properties",
     id: "propertiesLinkId",
   },
 ];
 
 const Footer = () => {
+  const { t, i18n } = useTranslation();
+  const isArabic = i18n.language === "ar";
+
   return (
-    <footer className="p-12 shadow-2xl  py-6  bg-white">
+    <footer className={`p-12 shadow-2xl py-6 bg-white ${isArabic ? "text-right" : "text-left"}`}>
       <div className="container flex flex-wrap gap-6 justify-between sm:px-12">
-        <div className="">
+        <div>
           <Image src="/logo.svg" alt="logo" width={50} height={50} />
-          <p className="my-6">Unleashing the Power of RealEstate</p>
+          <p className="my-6">{t("footerTagline")}</p>
           <div className="flex gap-2">
             {socialLinks.map((social) => (
               <Link
@@ -86,27 +92,28 @@ const Footer = () => {
         </div>
         <div className="flex gap-12">
           <div className="flex flex-col gap-2">
-            <p className="font-bold text-xl">Useful Links</p>
+            <p className="font-bold text-xl">{t("usefulLinks")}</p>
             {usefulLinks.map((link) => (
               <Link href={link.link} key={link.id}>
-                {link.name}
+                {t(link.name)}
               </Link>
             ))}
           </div>
           <div className="flex flex-col gap-2">
-            <p className="font-bold text-xl">Pages</p>
+            <p className="font-bold text-xl">{t("pages")}</p>
             {pagesLink.map((link) => (
               <Link href={link.link} key={link.id}>
-                {link.name}
+                {t(link.name)}
               </Link>
             ))}
           </div>
         </div>
         <p className="font-bold text-blueColor w-full text-center">
-          Copyright &copy; {new Date().getFullYear()}.
+          {t("copyright")} &copy; {new Date().getFullYear()}.
         </p>
       </div>
     </footer>
   );
 };
+
 export default Footer;

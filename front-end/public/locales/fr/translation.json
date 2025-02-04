@@ -1,0 +1,44 @@
+{
+    
+    "language": {
+      "en": "Anglais",
+      "ar": "Arabe", 
+      "fr": "Français"
+    },
+   
+    "welcome": "Bienvenue sur notre site Web",
+    "follow_us": "Suivez-nous sur",
+    "search_placeholder": "Recherchez des propriétés...",
+    "login": "Connexion",
+    "sign_up": "S'inscrire", 
+    "footerTagline": "Libérer le pouvoir de l'immobilier",
+    "usefulLinks": "Liens utiles",
+    "pages": "Pages",
+    "heroLink": "Accueil",
+    "aboutUsLink": "À propos de nous",
+    "featuresLink": "Fonctionnalités",
+    "contactUsLink": "Nous contacter",
+    "homeLink": "Page d'accueil",
+    "propertiesLink": "Propriétés",
+    "copyright": "Droits d'auteur",
+    "noPropertiesFound": "Aucune propriété trouvée",
+    "adjustSearchCriteria": "Essayez d'ajuster vos critères de recherche." , 
+
+    "find_home": "Trouvez votre maison de rêve",
+    "platform_description": "Notre plateforme vous aide à trouver la propriété idéale facilement.",
+    "all": "Tous",
+    "sale": "À vendre",
+    "rent": "À louer",
+    "type": "Type",
+    "category": "Catégorie",
+    "select_category": "Sélectionnez une catégorie",
+    "keyword": "Mot-clé",
+    "enter_keyword": "Entrez un mot-clé...",
+    "search": "Rechercher", 
+    
+    "Publicité": "Publicité",
+  "Properties for Rent": "Biens à louer",
+  "See more": "Voir plus",
+  "Properties for Sell": "Biens à vendre"
+    
+  }

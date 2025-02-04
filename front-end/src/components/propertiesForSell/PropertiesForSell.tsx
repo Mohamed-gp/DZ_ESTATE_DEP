@@ -4,12 +4,16 @@ import PropertyCard from "../propertyCard/PropertyCard";
 import { useEffect, useState } from "react";
 import customAxios from "@/utils/customAxios";
 
-const PropertiesForRent = () => {
+import { useTranslation } from 'react-i18next';
+const PropertiesForSale = () => {
+  const { t } = useTranslation();
   const [properties, setProperties] = useState([]);
+
   useEffect(() => {
-    getPropertiesForSell();
+    getPropertiesForSale();
   }, []);
-  const getPropertiesForSell = async () => {
+
+  const getPropertiesForSale = async () => {
     try {
       const { data } = await customAxios.get("/properties?status=sell");
       setProperties(data.data);
@@ -22,9 +26,9 @@ const PropertiesForRent = () => {
     <section className="my-12 py-12">
       <div className="container flex flex-col gap-2">
         <div className="flex items-center justify-between">
-          <p className="text-2xl font-bold">Properties for Sell </p>
+          <p className="text-2xl font-bold">{t("Properties for Sell")}</p>
           <Link href={"/properties"} className="text-blueColor">
-            See more{" "}
+            {t("See more")}
           </Link>
         </div>
         <div className="flex flex-wrap justify-center gap-12">
@@ -36,4 +40,4 @@ const PropertiesForRent = () => {
     </section>
   );
 };
-export default PropertiesForRent;
+export default PropertiesForSale;

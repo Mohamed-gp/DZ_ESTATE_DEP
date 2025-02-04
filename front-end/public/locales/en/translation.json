@@ -1,0 +1,43 @@
+{
+    
+    "language": {
+      "en": "English",
+      "ar": "Arabic", 
+      "fr": "French"
+    },
+    
+
+    "welcome": "Welcome to our website",
+    "follow_us": "Follow us on",
+    "search_placeholder": "Search for properties...",
+    "login": "Login",
+    "sign_up": "Sign Up" ,
+    "footerTagline": "Unleashing the Power of RealEstate",
+    "usefulLinks": "Useful Links",
+    "pages": "Pages",
+    "heroLink": "Hero",
+    "aboutUsLink": "About Us",
+    "featuresLink": "Features",
+    "contactUsLink": "Contact Us",
+    "homeLink": "Home",
+    "propertiesLink": "Properties",
+    "copyright": "Copyright" ,
+    "noPropertiesFound": "No properties found",
+    "adjustSearchCriteria": "Try adjusting your search criteria." , 
+    "find_home": "Find Your Dream Home",
+    "platform_description": "Our platform helps you find the perfect property with ease.",
+    "all": "All",
+    "sale": "For Sale",
+    "rent": "For Rent",
+    "type": "Type",
+    "category": "Category",
+    "select_category": "Select a Category",
+    "keyword": "Keyword",
+    "enter_keyword": "Enter a keyword...",
+    "search": "Search" , 
+
+    "Publicité": "Advertisement",
+    "Properties for Rent": "Properties for Rent",
+    "See more": "See more",
+    "Properties for Sell": "Properties for Sale" 
+  }
