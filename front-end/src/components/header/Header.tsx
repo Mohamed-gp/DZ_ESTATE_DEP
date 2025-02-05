@@ -6,11 +6,12 @@ import Link from "next/link";
 import { FaFacebookF, FaXTwitter } from "react-icons/fa6";
 import { FaLinkedinIn } from "react-icons/fa";
 import { IoMdAddCircleOutline, IoMdOptions } from "react-icons/io";
-import LanguageOptions from "../languageOptions/LanguageOptions";
+
+import LanguageOptions from "@/components/languageOptions/LanguageOptions"; 
 import useBoundStore from "@/store/store";
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-
+import { useTranslation } from 'react-i18next';
 const socialLinks = [
   {
     name: "LinkedIn",
@@ -39,6 +40,8 @@ const socialLinks = [
 ];
 
 const Header = () => {
+  
+  const {  t } = useTranslation();
   const { user } = useBoundStore((state) => state);
   const searchParams = useSearchParams();
   const [isMounted, setIsMounted] = useState(false);
@@ -62,10 +65,10 @@ const Header = () => {
     <header className="flex flex-col">
       <div className="header-top bg-blueColor py-2 text-white">
         <div className="container flex flex-col items-center justify-between text-center sm:text-left lg:flex-row">
-          <p className="text-sm">Welcome to Estatery online states store.</p>
+          <p className="text-sm">{t('welcome')}</p>
           <div className="flex flex-col-reverse items-center gap-6 sm:flex-row">
             <div className="flex items-center gap-2">
-              <p>Follow us:</p>
+              <p>{t('follow_us')}</p>
               {socialLinks.map((socialLink) => (
                 <a
                   key={socialLink.id}
@@ -81,7 +84,6 @@ const Header = () => {
             <div className="menus flex gap-6">
               <div className="language-menu">
                 <LanguageOptions />
-                {/* <CurrencyOptions /> */}
               </div>
             </div>
           </div>
@@ -100,7 +102,7 @@ const Header = () => {
                 value={searchParams.get("keyword") || ""}
                 onChange={(e) => searchHandler(e.target.value)}
                 className="h-full w-[50%] flex-1 px-4 focus:outline-none"
-                placeholder="Search for anything..."
+                placeholder={t('search_placeholder')}
               />
               <FaMagnifyingGlass className="mr-6" />
             </div>
@@ -111,13 +113,13 @@ const Header = () => {
               {user === null ? (
                 <div className="mx-auto flex items-center gap-2">
                   <Link href={"/auth/login"} className="border px-6 py-2">
-                    Login
+                    {t('login')}
                   </Link>
                   <Link
                     href={"/auth/register"}
                     className="bg-blueColor px-6 py-2 text-white"
                   >
-                    Sign up
+                    {t('sign_up')}
                   </Link>
                 </div>
               ) : (
@@ -139,7 +141,6 @@ const Header = () => {
                       className="rounded-full object-cover"
                       width={60}
                       height={60}
-                      // this is really got me confused, why is when i set unoptimized to false, it doesn't work maybe because its external image
                       unoptimized
                     />
                   </Link>

@@ -3,8 +3,10 @@ import customAxios from "@/utils/customAxios";
 import PropertyCard from "../propertyCard/PropertyCard";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import { useTranslation } from "next-i18next";
 
 const Properties = () => {
+  const { t } = useTranslation();
   const searchParams = useSearchParams();
   const [properties, setProperties] = useState([]);
 
@@ -28,13 +30,13 @@ const Properties = () => {
       {properties?.length === 0 ? (
         <div className="flex h-full flex-col items-center justify-center">
           <p className="text-2xl font-semibold text-gray-700">
-            No properties found
+            {t("noPropertiesFound")}
           </p>
-          <p className="text-gray-500">Try adjusting your search criteria.</p>
+          <p className="text-gray-500">{t("adjustSearchCriteria")}</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
-          {properties?.map((property: any) => (
+          {properties?.map((property:any) => (
             <PropertyCard key={property.id} property={property} />
           ))}
         </div>

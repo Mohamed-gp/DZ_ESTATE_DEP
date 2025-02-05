@@ -1,0 +1,43 @@
+{
+   
+    "language": {
+      "en": "الإنجليزية",
+      "ar": "العربية", 
+      "fr": "الفرنسية"
+    },
+    
+    
+        "welcome": "مرحبًا بك في موقعنا",
+        "follow_us": "تابعنا على",
+        "search_placeholder": "ابحث عن العقارات...",
+        "login": "تسجيل الدخول",
+        "sign_up": "إنشاء حساب",
+        "footerTagline": "إطلاق العنان لقوة العقارات",
+    "usefulLinks": "روابط مفيدة",
+    "pages": "الصفحات",
+    "heroLink": "الرئيسية",
+    "aboutUsLink": "معلومات عنا",
+    "featuresLink": "الميزات",
+    "contactUsLink": "اتصل بنا",
+    "homeLink": "الصفحة الرئيسية",
+    "propertiesLink": "العقارات",
+    "copyright": "حقوق النشر" , 
+    "noPropertiesFound": "لم يتم العثور على عقارات",
+    "adjustSearchCriteria": "حاول تعديل معايير البحث.",
+    "find_home": "ابحث عن منزلك المثالي",
+    "platform_description": "منصتنا تساعدك في العثور على العقار المناسب لك بسهولة.",
+    "all": "الكل",
+    "sale": "للبيع",
+    "rent": "للإيجار",
+    "type": "النوع",
+    "category": "الفئة",
+    "select_category": "اختر الفئة",
+    "keyword": "كلمة البحث",
+    "enter_keyword": "أدخل كلمة البحث...",
+    "search": "بحث", 
+    "Publicité": "إعلان",
+  "Properties for Rent": "عقارات للإيجار",
+  "See more": "المزيد",
+  "Properties for Sell": "عقارات للبيع"
+      
+  }

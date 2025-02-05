@@ -3,10 +3,12 @@ import { useEffect, useState } from "react";
 import clsx from "clsx";
 import customAxios from "@/utils/customAxios";
 import { useRouter } from "next/navigation";
+import { useTranslation } from "react-i18next";
 
 const Hero = () => {
+  const { t } = useTranslation();
   const [propertySaleStatus, setPropertySaleStatus] = useState("all");
-  const [categories, setCategories] = useState([]);
+  const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [keyword, setKeyword] = useState("");
 
@@ -46,71 +48,49 @@ const Hero = () => {
       <div className="relative w-full max-w-3xl px-4">
         <div className="w-full rounded-lg bg-opacity-75 p-8">
           <h1 className="mb-4 text-center text-4xl font-bold text-white">
-            Find Your Perfect Home
+            {t("find_home")}
           </h1>
           <p className="mb-8 text-center text-lg text-white">
-            A great platform to buy, sell, or even rent your properties without
-            any commissions.
+            {t("platform_description")}
           </p>
           <div className="mb-4 flex justify-center space-x-2">
-            <button
-              onClick={() => setPropertySaleStatus("all")}
-              className={clsx(
-                propertySaleStatus === "all"
-                  ? "bg-white text-blueColor"
-                  : "bg-blueColor text-white",
-                "rounded-md px-4 py-2 font-bold",
-              )}
-            >
-              All
-            </button>
-            <button
-              onClick={() => setPropertySaleStatus("sale")}
-              className={clsx(
-                propertySaleStatus === "sale"
-                  ? "bg-white text-blueColor"
-                  : "bg-blueColor text-white",
-                "rounded-md px-4 py-2 font-bold",
-              )}
-            >
-              Sale
-            </button>
-            <button
-              onClick={() => setPropertySaleStatus("rent")}
-              className={clsx(
-                propertySaleStatus === "rent"
-                  ? "bg-white text-blueColor"
-                  : "bg-blueColor text-white",
-                "rounded-md px-4 py-2 font-bold",
-              )}
-            >
-              Rent
-            </button>
+            {["all", "sale", "rent"].map((status) => (
+              <button
+                key={status}
+                onClick={() => setPropertySaleStatus(status)}
+                className={clsx(
+                  propertySaleStatus === status
+                    ? "bg-white text-blueColor"
+                    : "bg-blueColor text-white",
+                  "rounded-md px-4 py-2 font-bold"
+                )}
+              >
+                {t(status)}
+              </button>
+            ))}
           </div>
           <div className="mb-4 flex flex-col space-y-4 rounded-md bg-white p-4 md:flex-row md:space-x-4 md:space-y-0">
             <div className="flex flex-1 flex-col">
-              <label className="mb-1 text-sm font-semibold">Type</label>
+              <label className="mb-1 text-sm font-semibold">{t("type")}</label>
               <select
                 className="rounded-md border-gray-300 bg-gray-100 px-4 py-2"
                 value={propertySaleStatus}
                 onChange={(e) => setPropertySaleStatus(e.target.value)}
               >
-                <option value="all">All Type</option>
-                <option value="rent">Rent</option>
-                <option value="sale">Sell</option>
+                <option value="all">{t("all")}</option>
+                <option value="rent">{t("rent")}</option>
+                <option value="sale">{t("sale")}</option>
               </select>
             </div>
             <div className="flex flex-1 flex-col">
-              <label className="mb-1 text-sm font-semibold">Category</label>
+              <label className="mb-1 text-sm font-semibold">{t("category")}</label>
               <select
                 className="rounded-md border-gray-300 bg-gray-100 px-4 py-2"
                 value={selectedCategory}
-                onChange={(e) => {
-                  setSelectedCategory(e.target.value);
-                }}
+                onChange={(e) => setSelectedCategory(e.target.value)}
               >
                 <option value="" disabled>
-                  Select Category
+                  {t("select_category")}
                 </option>
                 {categories.map((category) => (
                   <option key={category.id} value={category.name}>
@@ -120,10 +100,10 @@ const Hero = () => {
               </select>
             </div>
             <div className="flex flex-1 flex-col">
-              <label className="mb-1 text-sm font-semibold">Keyword</label>
+              <label className="mb-1 text-sm font-semibold">{t("keyword")}</label>
               <input
                 type="text"
-                placeholder="Enter keyword"
+                placeholder={t("enter_keyword")}
                 className="rounded-md border-gray-300 bg-gray-100 px-4 py-2"
                 value={keyword}
                 onChange={(e) => setKeyword(e.target.value)}
@@ -135,7 +115,7 @@ const Hero = () => {
               onClick={searchHandler}
               className="rounded-md bg-blueColor px-4 py-2 font-bold text-white hover:bg-blueColor"
             >
-              Search
+              {t("search")}
             </button>
           </div>
         </div>

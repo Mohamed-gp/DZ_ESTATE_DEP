@@ -8,6 +8,8 @@ import { StoreProvider } from "@/providers/storeProvider";
 import SocketConnectClient from "@/components/socketConnectClient/SocketConnectClient";
 import { Suspense } from "react";
 
+import { Providers } from '@/app/providers'
+
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
   variable: "--font-geist-sans",
@@ -37,7 +39,14 @@ export default function RootLayout({
         <StoreProvider>
           <SocketConnectClient />
           <Toaster />
-          <Suspense
+          
+            
+           
+         
+            
+            
+          <Providers> 
+            <Suspense
             fallback={
               <div className="flex h-16 items-center justify-center bg-white shadow-md">
                 <div className="loader h-8 w-8 rounded-full border-4 border-t-4 border-gray-200 ease-linear"></div>
@@ -46,7 +55,9 @@ export default function RootLayout({
           >
             <Header />
           </Suspense>
+          
           {children}
+          </Providers>
           <Footer />
         </StoreProvider>
       </body>
