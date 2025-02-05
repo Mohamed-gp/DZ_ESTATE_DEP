@@ -35,10 +35,10 @@ const Page = () => {
   };
 
   return (
-    <div className="container my-12 flex w-full flex-col items-center justify-center bg-white py-12 md:w-[50%]">
+    <div style={{minHeight : "calc(100vh - 500px)"}} className="container my-12 rounded-xl flex w-full flex-col items-center justify-center bg-white py-12 md:w-[50%]">
       <form
         onSubmit={handleSubmit}
-        className="flex w-full flex-col items-center"
+        className="flex w-full flex-col gap-6 items-center"
       >
         <div className="flex items-center justify-center">
           <h1 className="text-xl font-bold sm:text-4xl">
@@ -64,9 +64,8 @@ const Page = () => {
           {dataToSubmit.loading ? "Loading ..." : "Login"}
         </button>
 
-        <Link href="/auth/register" className="text-[#001D6C]">
-          Login ? <span className="font-bold">Sign Up</span>
-        </Link>
+        
+        
       </form>
     </div>
   );

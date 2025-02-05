@@ -90,6 +90,7 @@ const PropertyForm = () => {
       const { data } = await customAxios.post("/properties/add", formData);
       toast.success(data.message);
     } catch (error) {
+      toast.error(error.response.data.message);
       console.log(error);
     }
   };
@@ -287,7 +288,7 @@ const PropertyForm = () => {
                 <input
                   type="number"
                   className={`border-gray-300} w-full rounded-lg border p-3 transition-all focus:border-blue-500 focus:ring-2 focus:ring-blue-500`}
-                  placeholder="Enter area"
+                  placeholder="Enter Guests"
                   onChange={(e) => {
                     setDataToSubmit({
                       ...dataToSubmit,

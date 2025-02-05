@@ -33,7 +33,7 @@ const validateCreateProperty = (obj : any) => {
     quartier: joi.string().min(1).messages({ 
         'string.min': "Quartier is required" 
     }),
-    area: joi.number().min(1).messages({ 
+    guests: joi.number().min(1).messages({ 
         'number.min': "Area must be greater than 0" 
     }),
     bedrooms: joi.number().min(0).messages({ 
@@ -42,6 +42,7 @@ const validateCreateProperty = (obj : any) => {
     bathrooms: joi.number().min(0).messages({ 
         'number.min': "Bathrooms cannot be negative" 
     }),
+    
     files: joi.array().items(joi.object().instance(File)).optional(),
 })
 

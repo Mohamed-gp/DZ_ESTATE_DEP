@@ -34,7 +34,8 @@ const addPropertyController = async (req: authRequest, res: Response, next: Next
     }
 
     const { title, description, price, status, commune, quartier, wilaya, longitude, latitude, guests, bedrooms, bathrooms, category,features } = req.body;
-    console.log(features);
+    
+    console.log(features,"this is a features");
     return ;
     const files = req.files as Express.Multer.File[];
 

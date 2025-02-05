@@ -5,6 +5,8 @@ import { FaChevronDown } from "react-icons/fa6";
 import { LANGUAGES_OPTIONS } from "@/utils/data";
 
 const LanguageOptions = () => {
+  const [isRendered, setIsRendered] = useState(false);
+
   const { language, changeLanguage } = useBoundStore((state) => state);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef(null);
@@ -32,10 +34,16 @@ const LanguageOptions = () => {
     };
   }, [isMenuOpen]);
 
+  useEffect(() => {
+    setIsRendered(true);
+  }, []);
+  if (isRendered === false) {
+    return null;
+  }
   return (
     <div
       ref={buttonRef}
-      className="relative flex cursor-pointer items-center gap-1 z-[10]"
+      className="relative z-[10] flex cursor-pointer items-center gap-1"
       onClick={() => setIsMenuOpen(!isMenuOpen)}
     >
       <p>{language}</p>
