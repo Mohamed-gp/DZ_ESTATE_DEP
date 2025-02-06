@@ -21,10 +21,12 @@ const PayementModel = ({
   const reserveHandler = async () => {
     try {
       const { data } = await customAxios.post(
-        `/properties/${property?.id}/reserve/${selectedPayement}`,
+        `/reservations/${property?.id}/reserve/${selectedPayement}`,
         {
-          checkIn: new Date(state[0]?.startDate).toISOString().slice(0, 10),
-          checkOut: new Date(state[0]?.endDate).toISOString().slice(0, 10),
+          property_id: property?.id,
+          start_date: new Date(state[0]?.startDate).toISOString().slice(0, 10),
+          end_date: new Date(state[0]?.endDate).toISOString().slice(0, 10),
+          payment_method: selectedPayement,
         },
       );
       toast.success(data.message);

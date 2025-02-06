@@ -1,52 +1,52 @@
+import { Request, Response } from "express";
 import Stripe from "stripe";
-import pool from "../config/connectDb.js";
+import pool from "../config/connectDb";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-    apiVersion: "2020-08-27" as "2024-12-18.acacia",
+  apiVersion: "2024-12-18.acacia",
 });
 
-const webhook = async (req, res) => {
-    const sig = req.headers["stripe-signature"];
-    let event;
+const handleStripeWebhook = async (req: Request, res: Response) => {
+  const sig = req.headers["stripe-signature"];
 
-    try {
-        event = stripe.webhooks.constructEvent(
-            req.body,
-            sig,
-            process.env.STRIPE_WEBHOOK_SECRET
-        );
+  let event;
 
-        // Switch based on the event type
-        switch (event.type) {
-            case "checkout.session.completed":
-                const session = event.data.object;
-                const reservationId = session.metadata.reservationId;
+  try {
+    event = stripe.webhooks.constructEvent(
+      req.body,
+      sig,
+      process.env.STRIPE_WEBHOOK_SECRET
+    );
+  } catch (err) {
+    console.error(`Webhook signature verification failed: ${err.message}`);
+    return res.status(400).send(`Webhook Error: ${err.message}`);
+  }
 
-                await pool.query(
-                    "UPDATE reservations SET status = $1 WHERE id = $2",
-                    ["paid", reservationId]
-                );
+  // Handle the event
+  switch (event.type) {
+    case "payment_intent.succeeded":
+      const paymentIntent = event.data.object as Stripe.PaymentIntent;
+      // Update your database with the payment status
+      await pool.query(
+        `UPDATE orders SET status = 'paid' WHERE payment_intent_id = $1`,
+        [paymentIntent.id]
+      );
+      break;
+    case "payment_intent.payment_failed":
+      const paymentFailedIntent = event.data.object as Stripe.PaymentIntent;
+      // Update your database with the payment status
+      await pool.query(
+        `UPDATE orders SET status = 'failed' WHERE payment_intent_id = $1`,
+        [paymentFailedIntent.id]
+      );
+      break;
+    // Handle other event types as needed
+    default:
+      console.log(`Unhandled event type ${event.type}`);
+  }
 
-                break;
-            case "payment_intent.payment_failed":
-                const paymentFailed = event.data.object;
-                console.log(paymentFailed);
-                break;
-
-            case "checkout.session.expired":
-                const sessionExpired = event.data.object;
-                console.log(sessionExpired);
-                // Handle the expired payment.
-                break;
-            default:
-                console.log("Unknown event type");
-        }
-
-        res.sendStatus(200);
-    } catch (err) {
-        console.error(`⚠️  Webhook signature verification failed.`, err.message);
-        res.status(400).send(`Webhook Error: ${err.message}`);
-    }
+  // Return a response to acknowledge receipt of the event
+  res.json({ received: true });
 };
 
-export default webhook;
+export { handleStripeWebhook };

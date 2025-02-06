@@ -11,6 +11,7 @@ import adminRouter from "./api/adminRouter";
 import featuresRouter from "./api/featuresRouter";
 import subscribersRouter from "./api/subscribersRouter";
 import reviewsRouter from "./api/reviewsRouter";
+import reservationsRouter from "./api/reservationsRouter";
 
 const router = Router();
 
@@ -24,7 +25,8 @@ router.use("/notifications", notificationRouter);
 router.use("/admin", adminRouter);
 router.use("/features", featuresRouter);
 router.use("/subscribers", subscribersRouter);
+router.use("/reservations", reservationsRouter);
 router.use("/reviews", reviewsRouter);
-// router.use("/stripe", stripeRouter);
+router.use("/webhook", stripeRouter);
 
 export default router;

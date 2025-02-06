@@ -1,20 +1,12 @@
 import express from "express";
-import webhook from "../../controllers/stripeControllers";
+import { handleStripeWebhook } from "../../controllers/stripeControllers";
 
+const router = express.Router();
 
-const stripeRouter = express.Router();
-
-stripeRouter.post(
-  "/webhook",
+router.post(
+  "/",
   express.raw({ type: "application/json" }),
-  webhook
+  handleStripeWebhook
 );
 
-stripeRouter.get("/success", (req, res) => {
-  res.json({ data: null, message: "payment completed successfully" });
-});
-stripeRouter.get("/failed", (req, res) => {
-  res.json({ data: null, message: "payment has failure" });
-});
-
-export default stripeRouter;
+export default router;

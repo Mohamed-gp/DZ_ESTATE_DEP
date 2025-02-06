@@ -437,7 +437,6 @@ const SingleProperty = () => {
                         ranges={state}
                       />
                       <button
-                        // onClick={() => reserveHandler()}
                         onClick={() => setIsPaymentModelOpen(true)}
                         disabled={daysCount == 0}
                         className="mx-auto my-2 flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#3d91ff] px-6 py-1 text-white duration-300 hover:scale-105 disabled:cursor-not-allowed disabled:opacity-50"
