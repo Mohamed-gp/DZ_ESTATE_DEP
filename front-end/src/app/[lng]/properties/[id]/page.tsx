@@ -5,7 +5,7 @@ import { DateRange } from "react-date-range";
 import "react-date-range/dist/styles.css"; // main css file
 import "react-date-range/dist/theme/default.css"; // theme css file
 import { LuGrip } from "react-icons/lu";
-import { FaStar, FaX } from "react-icons/fa6";
+import { FaStar, FaTrash, FaX } from "react-icons/fa6";
 import customAxios from "@/utils/customAxios";
 import "leaflet/dist/leaflet.css";
 import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.webpack.css";
@@ -31,6 +31,9 @@ const SingleProperty = () => {
 
   const [property, setProperty] = useState<any>(null);
   const [reviews, setReviews] = useState([]);
+  useEffect(() => {
+    console.log("reviews", reviews);
+  }, [reviews]);
   const [review, setReview] = useState({
     rating: 5,
     comment: "",
@@ -56,7 +59,8 @@ const SingleProperty = () => {
 
   const getHouseReviews = async () => {
     try {
-      const { data } = await customAxios.get(`/homes/${id}/reviews`);
+      const { data } = await customAxios.get(`/reviews/${id}`);
+      console.log("data reviews", data);
       setReviews(data.data);
     } catch (error) {
       console.log(error);
@@ -65,7 +69,7 @@ const SingleProperty = () => {
   };
   useEffect(() => {
     getHouseById();
-    // getHouseReviews();
+    getHouseReviews();
   }, []);
 
   useEffect(() => {
@@ -95,9 +99,10 @@ const SingleProperty = () => {
   }, []);
   const addReviewHandler = async () => {
     try {
-      const { data } = await customAxios.post(`/homes/${id}/review`, {
+      const { data } = await customAxios.post(`/reviews`, {
         rating: 6 - review.rating,
         comment: review.comment,
+        property_id: id,
       });
       getHouseReviews();
 
@@ -108,6 +113,7 @@ const SingleProperty = () => {
     }
   };
   const deleteReviewHandler = (id) => {
+    console.log(id);
     Swal.fire({
       title: "Are you sure to remove this Review?",
       text: "You won't be able to revert this!",
@@ -119,7 +125,7 @@ const SingleProperty = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const { data } = await customAxios.delete(`/homes/${id}/review`);
+          const { data } = await customAxios.delete(`/reviews/${id}`);
           getHouseReviews();
           toast.success(data.message);
           Swal.fire({
@@ -381,27 +387,27 @@ const SingleProperty = () => {
                         type="submit"
                         disabled={review.comment.trim() == ""}
                         onClick={() => addReviewHandler()}
-                        className="bg-buttonColor flex items-center justify-center px-4 py-2.5 text-center text-xs font-medium text-white disabled:cursor-not-allowed disabled:opacity-50"
+                        className="flex items-center justify-center bg-blueColor px-4 py-2.5 text-center text-xs font-medium text-white disabled:cursor-not-allowed disabled:opacity-50"
                       >
                         Post comment
                       </button>
                     </>
                   )}
                   <>
-                    {/* {reviews?.map((review) => (
+                    {reviews?.map((review) => (
                       <div
-                        key={review}
+                        key={review.id}
                         className="my-4 flex flex-col border-y border-y-[#4561ec26] py-4"
                       >
                         <div className="my-3 flex items-center gap-2">
                           <div className="size-10 overflow-hidden rounded-full">
-                            <img src={review?.User?.profileImage} alt="" />
+                            <img src={review?.profile_image} alt="" />
                           </div>
                           <div className="gap2 flex flex-1 flex-col opacity-90">
                             <Rating rating={review?.rating} />
-                            <p>{review?.User?.username}</p>
+                            <p>{review?.username}</p>
                           </div>
-                          {review?.User?.id == user?.id && (
+                          {review?.user_id == user?.id && (
                             <FaTrash
                               onClick={() => deleteReviewHandler(review?.id)}
                               className="cursor-pointer text-red-400"
@@ -412,42 +418,59 @@ const SingleProperty = () => {
                           {review?.comment}
                         </p>
                       </div>
-                    ))} */}
+                    ))}
                   </>
                 </div>
               </div>
-              {(property?.owner?.id != user?.id || !user) && (
+              {property?.owner_id != user?.id && user && (
                 <>
-                  <div className="col-span-4 flex h-fit flex-col rounded-xl bg-white p-6">
-                    <p className="my-2">
-                      <span className="text-2xl">${property?.price} </span>{" "}
-                      night
-                    </p>
-                    <DateRange
-                      editableDateInputs={true}
-                      onChange={(item) => setState([item.selection])}
-                      moveRangeOnFirstSelection={false}
-                      ranges={state}
-                    />
-                    <button
-                      // onClick={() => reserveHandler()}
-                      onClick={() => setIsPaymentModelOpen(true)}
-                      disabled={daysCount == 0}
-                      className="mx-auto my-2 flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#3d91ff] px-6 py-1 text-white duration-300 hover:scale-105 disabled:cursor-not-allowed disabled:opacity-50"
-                    >
-                      Reserve
-                    </button>
-                    <div className="my-2 flex justify-between text-2xl">
-                      <p className="text-lg font-bold">Nights</p>
-                      <p>
-                        {daysCount} * ${property?.price}
+                  {property?.status == "rent" ? (
+                    <div className="col-span-4 flex h-fit flex-col rounded-xl bg-white p-6">
+                      <p className="my-2">
+                        <span className="text-2xl">${property?.price} </span>{" "}
+                        night
                       </p>
+                      <DateRange
+                        editableDateInputs={true}
+                        onChange={(item) => setState([item.selection])}
+                        moveRangeOnFirstSelection={false}
+                        ranges={state}
+                      />
+                      <button
+                        // onClick={() => reserveHandler()}
+                        onClick={() => setIsPaymentModelOpen(true)}
+                        disabled={daysCount == 0}
+                        className="mx-auto my-2 flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#3d91ff] px-6 py-1 text-white duration-300 hover:scale-105 disabled:cursor-not-allowed disabled:opacity-50"
+                      >
+                        Reserve
+                      </button>
+                      <div className="my-2 flex justify-between text-2xl">
+                        <p className="text-lg font-bold">Nights</p>
+                        <p>
+                          {daysCount} * ${property?.price}
+                        </p>
+                      </div>
+                      <div className="my-2 flex justify-between text-2xl">
+                        <p className="font-bold">Total</p>
+                        <p>{daysCount * property?.price}$</p>
+                      </div>
                     </div>
-                    <div className="my-2 flex justify-between text-2xl">
-                      <p className="font-bold">Total</p>
-                      <p>{daysCount * property?.price}$</p>
-                    </div>
-                  </div>
+                  ) : (
+                    <>
+                      <p className="my-2">
+                        <span className="text-2xl">${property?.price} </span>{" "}
+                        night
+                      </p>
+                      <button
+                        // onClick={() => reserveHandler()}
+                        onClick={() => setIsPaymentModelOpen(true)}
+                        disabled={daysCount == 0}
+                        className="mx-auto my-2 flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#3d91ff] px-6 py-1 text-white duration-300 hover:scale-105 disabled:cursor-not-allowed disabled:opacity-50"
+                      >
+                        Reserve
+                      </button>
+                    </>
+                  )}
                 </>
               )}
             </div>

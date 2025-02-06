@@ -195,7 +195,7 @@ const PropertyForm = () => {
                   }}
                 >
                   {categories?.map((category) => (
-                    <option key={category.id} value={category.name}>
+                    <option key={category.id} value={category.id}>
                       {category.name}
                     </option>
                   ))}

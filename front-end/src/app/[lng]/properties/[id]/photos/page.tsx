@@ -32,7 +32,7 @@ const PhotosModel = () => {
       </Link>
       <div className="mt-12 flex w-[50%] flex-col items-center justify-center gap-5">
         {images.map((image: any) => (
-          <>
+          <div key={image?.url} className="relative h-[500px] w-full">
             {image.type === "image" ? (
               <img
                 key={image?.url}
@@ -50,7 +50,7 @@ const PhotosModel = () => {
                 className="rounded-2xl"
               />
             )}
-          </>
+          </div>
         ))}
       </div>
     </div>

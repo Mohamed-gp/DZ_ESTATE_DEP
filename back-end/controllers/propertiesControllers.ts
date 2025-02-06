@@ -246,10 +246,23 @@ const getProperty = async (req: Request, res: Response) => {
           json_build_object('type', property_assets.type, 'url', property_assets.asset_url)
         ) FILTER (WHERE property_assets.id IS NOT NULL),
         '[]'
-      ) AS assets
+      ) AS assets,
+      COALESCE(
+        json_agg(
+          json_build_object(
+            'id', reviews.id,
+            'user_id', reviews.user_id,
+            'rating', reviews.rating,
+            'comment', reviews.comment,
+            'created_at', reviews.created_at
+          )
+        ) FILTER (WHERE reviews.id IS NOT NULL),
+        '[]'
+      ) AS comments
     FROM properties
     LEFT JOIN users ON properties.owner_id = users.id
     LEFT JOIN property_assets ON properties.id = property_assets.property_id
+    LEFT JOIN reviews ON properties.id = reviews.property_id
     WHERE properties.id = $1
     GROUP BY properties.id, users.id
   `;

@@ -10,6 +10,7 @@ import categoriesRouter from "./api/categoriesRouter";
 import adminRouter from "./api/adminRouter";
 import featuresRouter from "./api/featuresRouter";
 import subscribersRouter from "./api/subscribersRouter";
+import reviewsRouter from "./api/reviewsRouter";
 
 const router = Router();
 
@@ -17,13 +18,13 @@ router.use("/auth", authRouter);
 router.use("/user", userRouter);
 router.use("/properties", propertiesRouter);
 router.use("/categories", categoriesRouter);
-router.use("/chat" , chatRouter);
-router.use("/analytics",analyticsRouter)
-router.use("/notifications",notificationRouter)
-router.use("/admin",adminRouter)
+router.use("/chat", chatRouter);
+router.use("/analytics", analyticsRouter);
+router.use("/notifications", notificationRouter);
+router.use("/admin", adminRouter);
 router.use("/features", featuresRouter);
 router.use("/subscribers", subscribersRouter);
+router.use("/reviews", reviewsRouter);
 // router.use("/stripe", stripeRouter);
-
 
 export default router;

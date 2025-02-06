@@ -26,6 +26,10 @@ const Page = () => {
     e.preventDefault();
 
     try {
+      if (!isValidPhoneNumber(dataToSubmit.phoneNumber)) {
+        toast.error("Invalid Phone Number");
+        return;
+      }
       const { data } = await customAxios.post("/auth/register", dataToSubmit);
       setUser(data.data.user);
       router.push("/");
@@ -34,6 +38,10 @@ const Page = () => {
       toast.error(error.response.data.message);
       console.log(error);
     }
+  };
+  const isValidPhoneNumber = (phoneNumber: string): boolean => {
+    const phoneRegex = /^\d{10}$/;
+    return phoneRegex.test(phoneNumber) && !isNaN(Number(phoneNumber));
   };
 
   return (

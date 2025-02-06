@@ -4,6 +4,7 @@ import axios, {
   AxiosError,
   InternalAxiosRequestConfig,
 } from "axios";
+import toast from "react-hot-toast";
 
 const customAxios: AxiosInstance = axios.create({
   baseURL:
@@ -20,7 +21,7 @@ customAxios.interceptors.response.use(
       _retry?: boolean;
     };
 
-    if (error.response?.status === 401) {
+    if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
       try {
