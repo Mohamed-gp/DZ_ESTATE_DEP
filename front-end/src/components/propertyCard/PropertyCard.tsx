@@ -107,6 +107,7 @@ const PropertyCard = ({ property, getProperties }: PropertyCardProps) => {
           <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
         </div>
         {property?.assets?.map((asset: any, index: number) => {
+          console.log(property?.assets);
           return (
             <div key={uuid()}>
               {property?.assets[index]?.type == "image" && (
@@ -127,7 +128,7 @@ const PropertyCard = ({ property, getProperties }: PropertyCardProps) => {
         })}
 
         {/* Favorite Button */}
-        {user?.id && (
+        {user?.id && user.role != "admin" && (
           <button
             onClick={(e) => {
               e.preventDefault();
@@ -174,7 +175,9 @@ const PropertyCard = ({ property, getProperties }: PropertyCardProps) => {
           <span className="text-2xl font-bold text-blue-600">
             ${property.price.toLocaleString()}
           </span>
-          <span className="text-sm text-gray-600">/month</span>
+          {property?.status === "rent" && (
+            <span className="text-sm text-gray-600">/month</span>
+          )}
         </div>
 
         <div className="grid grid-cols-3 gap-4 border-t border-gray-100 pt-4">

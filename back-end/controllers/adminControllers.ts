@@ -22,10 +22,53 @@ const getAllProperties = async (
   next: NextFunction
 ) => {
   try {
-    const properties = await pool.query("SELECT * FROM properties");
-    return res.status(200).json({
-      message: "Properties fetched successfully",
+    let { page = "1", limit = "7", searchText = "" } = req.query;
+
+    // Initialisation de la requête
+    let query = `
+        SELECT 
+          properties.*,
+          COALESCE(
+            json_agg(
+              json_build_object('type', property_assets.type, 'url', property_assets.asset_url)
+            ) FILTER (WHERE property_assets.id IS NOT NULL),
+            '[]'
+          ) AS assets
+        FROM properties
+        LEFT JOIN property_assets ON properties.id = property_assets.property_id
+      `;
+    let queryValues: any[] = [];
+    let index = 1;
+
+    // Recherche textuelle
+    if (searchText) {
+      query += ` WHERE (properties.title ILIKE $${index} OR properties.description ILIKE $${index})`;
+      queryValues.push(`%${searchText}%`);
+      index++;
+    }
+
+    // Regrouper par ID des propriétés
+    query += ` GROUP BY properties.id`;
+
+    // Pagination
+    if (page && limit) {
+      const startIndex = (+page - 1) * +limit;
+      query += ` LIMIT $${index} OFFSET $${index + 1}`;
+      queryValues.push(+limit, startIndex);
+    }
+
+    // Exécution de la requête
+    const properties = await pool.query(query, queryValues);
+
+    // Vérification des résultats
+    if (!properties.rows.length) {
+      return res.json({ message: "Aucune propriété trouvée.", data: null });
+    }
+
+    // Retour des données
+    return res.json({
       data: properties.rows,
+      message: "Properties fetched successfully",
     });
   } catch (error) {
     next(error);
