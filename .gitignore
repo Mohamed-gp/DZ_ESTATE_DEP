@@ -1,2 +1,4 @@
 /node_modules
 instuctions.sql
+front-end/.env
+back-end/.env
