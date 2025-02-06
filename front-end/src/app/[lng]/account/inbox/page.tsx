@@ -36,7 +36,13 @@ const InboxPage = () => {
 
       newSocket.on("new_message", (message) => {
         if (message.room_id === selectedRoom) {
-          setMessages((prevMessages) => [...prevMessages, message]);
+          setMessages((prevMessages) => {
+            // Check if the message is already in the state
+            if (!prevMessages.some((msg) => msg.id === message.id)) {
+              return [...prevMessages, message];
+            }
+            return prevMessages;
+          });
         }
       });
 
@@ -76,8 +82,17 @@ const InboxPage = () => {
         message: newMessage,
       });
 
+      // Emit the message via socket
       socket.emit("send_message", data.data);
-      setMessages((prevMessages) => [...prevMessages, data.data]);
+
+      // Add the message to the state only if it is not already there
+      setMessages((prevMessages) => {
+        if (!prevMessages.some((msg) => msg.id === data.data.id)) {
+          return [...prevMessages, data.data];
+        }
+        return prevMessages;
+      });
+
       setNewMessage("");
     } catch (error) {
       toast.error(error.response.data.message);
