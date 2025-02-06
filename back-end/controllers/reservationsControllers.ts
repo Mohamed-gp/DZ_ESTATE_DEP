@@ -7,8 +7,12 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
   apiVersion: "2024-12-18.acacia",
 });
 
-const reserveOrBuyProperty = async (req: authRequest, res: Response, next: NextFunction) => {
-  const { property_id, start_date, end_date, payment_method } = req.body;
+const reserveOrBuyProperty = async (
+  req: authRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  const { property_id, start_date, end_date } = req.body;
   const user_id = req.user.id;
 
   try {
@@ -24,7 +28,7 @@ const reserveOrBuyProperty = async (req: authRequest, res: Response, next: NextF
 
     const property = propertyResult.rows[0];
 
-    if (property.status === 'rent') {
+    if (property.status === "rent") {
       // Check for overlapping reservations
       const overlappingReservations = await pool.query(
         `SELECT * FROM reservations 
@@ -34,76 +38,78 @@ const reserveOrBuyProperty = async (req: authRequest, res: Response, next: NextF
       );
 
       if (overlappingReservations.rows.length > 0) {
-        return res.status(400).json({ message: "The property is already reserved for the selected dates" });
+        return res.status(400).json({
+          message: "The property is already reserved for the selected dates",
+        });
       }
 
-      // Handle payment
-      const amount = property.price * 100; // Convert to cents for Stripe
-
-      const paymentIntent = await stripe.paymentIntents.create({
-        amount,
-        currency: 'usd',
-        payment_method_types: ['card'],
-        metadata: { property_id: property.id, user_id },
+      // Create a Stripe Checkout Session for the reservation
+      const session = await stripe.checkout.sessions.create({
+        payment_method_types: ["card"],
+        line_items: [
+          {
+            price_data: {
+              currency: "usd",
+              product_data: {
+                name: property.title,
+              },
+              unit_amount: property.price * 100, // Convert to cents
+            },
+            quantity: 1,
+          },
+        ],
+        mode: "payment",
+        success_url: `${process.env.CLIENT_URL}/reservation-success?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${process.env.CLIENT_URL}/reservation-cancel`,
+        metadata: {
+          property_id: property.id,
+          user_id: user_id,
+          start_date: start_date,
+          end_date: end_date,
+        },
       });
-
-      // Confirm the payment
-      const paymentConfirmation = await stripe.paymentIntents.confirm(paymentIntent.id, {
-        payment_method,
-      });
-
-      if (paymentConfirmation.status !== 'succeeded') {
-        return res.status(400).json({ message: "Payment failed" });
-      }
-
-      // Create reservation
-      const reservationResult = await pool.query(
-        `INSERT INTO reservations (user_id, property_id, start_date, end_date, status, payment_method, created_at, updated_at) 
-         VALUES ($1, $2, $3, $4, 'confirmed', $5, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP) 
-         RETURNING *`,
-        [user_id, property_id, start_date, end_date, payment_method]
-      );
 
       return res.status(201).json({
-        data: reservationResult.rows[0],
-        message: "Reservation created successfully",
+        url: session.url,
+        message: "Reservation session created successfully",
       });
-    } else if (property.status === 'sell') {
-      // Handle payment
-      const amount = property.price * 100; // Convert to cents for Stripe
-
-      const paymentIntent = await stripe.paymentIntents.create({
-        amount,
-        currency: 'usd',
-        payment_method_types: ['card'],
-        metadata: { property_id: property.id, user_id },
+    } else if (property.status === "sell") {
+      // Create a Stripe Checkout Session for the purchase
+      const session = await stripe.checkout.sessions.create({
+        payment_method_types: ["card"],
+        line_items: [
+          {
+            price_data: {
+              currency: "usd",
+              product_data: {
+                name: property.title,
+              },
+              unit_amount: property.price * 100, // Convert to cents
+            },
+            quantity: 1,
+          },
+        ],
+        mode: "payment",
+        success_url: `${process.env.CLIENT_URL}/purchase-success?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${process.env.CLIENT_URL}/purchase-cancel`,
+        metadata: {
+          property_id: property.id,
+          user_id: user_id,
+        },
       });
-
-      // Confirm the payment
-      const paymentConfirmation = await stripe.paymentIntents.confirm(paymentIntent.id, {
-        payment_method,
-      });
-
-      if (paymentConfirmation.status !== 'succeeded') {
-        return res.status(400).json({ message: "Payment failed" });
-      }
-
-      // Mark property as sold or remove from listings
-      await pool.query(
-        `UPDATE properties SET status = 'sold' WHERE id = $1`,
-        [property_id]
-      );
 
       return res.status(201).json({
-        data: paymentConfirmation,
-        message: "Property purchased successfully",
+        url: session.url,
+        message: "Purchase session created successfully",
       });
     } else {
       return res.status(400).json({ message: "Invalid property status" });
     }
   } catch (error) {
     console.error("Error processing request:", error);
-    return res.status(500).json({ message: "An error occurred while processing the request" });
+    return res
+      .status(500)
+      .json({ message: "An error occurred while processing the request" });
   }
 };
 

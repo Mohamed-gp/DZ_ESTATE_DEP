@@ -20,15 +20,18 @@ const PayementModel = ({
   const [selectedPayement, setSelectedPayement] = useState<string>("stripe");
   const reserveHandler = async () => {
     try {
-      const { data } = await customAxios.post(
-        `/reservations/${property?.id}/reserve/${selectedPayement}`,
-        {
-          property_id: property?.id,
-          start_date: new Date(state[0]?.startDate).toISOString().slice(0, 10),
-          end_date: new Date(state[0]?.endDate).toISOString().slice(0, 10),
-          payment_method: selectedPayement,
-        },
-      );
+      console.log({
+        property_id: property?.id,
+        start_date: new Date(state[0]?.startDate).toISOString().slice(0, 10),
+        end_date: new Date(state[0]?.endDate).toISOString().slice(0, 10),
+        payment_method: selectedPayement,
+      });
+      const { data } = await customAxios.post(`/reservations`, {
+        property_id: property?.id,
+        start_date: new Date(state[0]?.startDate).toISOString().slice(0, 10),
+        end_date: new Date(state[0]?.endDate).toISOString().slice(0, 10),
+        payment_method: selectedPayement,
+      });
       toast.success(data.message);
       window.open(data.url, "_blank");
     } catch (error) {

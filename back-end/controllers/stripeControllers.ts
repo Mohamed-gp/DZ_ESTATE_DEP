@@ -24,21 +24,27 @@ const handleStripeWebhook = async (req: Request, res: Response) => {
 
   // Handle the event
   switch (event.type) {
-    case "payment_intent.succeeded":
-      const paymentIntent = event.data.object as Stripe.PaymentIntent;
-      // Update your database with the payment status
-      await pool.query(
-        `UPDATE orders SET status = 'paid' WHERE payment_intent_id = $1`,
-        [paymentIntent.id]
-      );
-      break;
-    case "payment_intent.payment_failed":
-      const paymentFailedIntent = event.data.object as Stripe.PaymentIntent;
-      // Update your database with the payment status
-      await pool.query(
-        `UPDATE orders SET status = 'failed' WHERE payment_intent_id = $1`,
-        [paymentFailedIntent.id]
-      );
+    case "checkout.session.completed":
+      const session = event.data.object as Stripe.Checkout.Session;
+
+      if (session.mode === "payment" && session.payment_status === "paid") {
+        const { property_id, user_id, start_date, end_date } = session.metadata;
+
+        if (session.metadata.start_date && session.metadata.end_date) {
+          // Create reservation
+          await pool.query(
+            `INSERT INTO reservations (user_id, property_id, start_date, end_date, status, payment_method, created_at, updated_at) 
+             VALUES ($1, $2, $3, $4, 'confirmed', 'stripe', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`,
+            [user_id, property_id, start_date, end_date]
+          );
+        } else {
+          // Mark property as sold
+          await pool.query(
+            `UPDATE properties SET status = 'sold' WHERE id = $1`,
+            [property_id]
+          );
+        }
+      }
       break;
     // Handle other event types as needed
     default:
