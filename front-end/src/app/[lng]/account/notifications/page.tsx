@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { formatDistanceToNow } from "date-fns";
 import { Bell, CheckCircle, AlertCircle, Info } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 interface Notification {

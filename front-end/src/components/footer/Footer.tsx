@@ -1,9 +1,10 @@
-'use client'
+"use client";
 import Link from "next/link";
 import Image from "next/image";
 import { FaFacebookF, FaXTwitter, FaInstagram } from "react-icons/fa6";
 import { FaLinkedinIn } from "react-icons/fa";
-import { useTranslation } from 'react-i18next';
+import initTranslations from "@/app/i18n";
+import { useTranslation } from "react-i18next";
 
 const socialLinks = [
   {
@@ -69,12 +70,11 @@ const pagesLink = [
 ];
 
 const Footer = () => {
-  const { t, i18n } = useTranslation();
-  const isArabic = i18n.language === "ar";
+  const { t } = useTranslation();
 
   return (
-    <footer className={`p-12 shadow-2xl py-6 bg-white ${isArabic ? "text-right" : "text-left"}`}>
-      <div className="container flex flex-wrap gap-6 justify-between sm:px-12">
+    <footer className={`bg-white p-12 py-6 shadow-2xl`}>
+      <div className="container flex flex-wrap justify-between gap-6 sm:px-12">
         <div>
           <Image src="/logo.svg" alt="logo" width={50} height={50} />
           <p className="my-6">{t("footerTagline")}</p>
@@ -83,7 +83,7 @@ const Footer = () => {
               <Link
                 href={social.link}
                 key={social.id}
-                className="bg-blueColor/50 hover:bg-blueColor duration-300 w-6 h-6 rounded-sm flex justify-center items-center"
+                className="flex h-6 w-6 items-center justify-center rounded-sm bg-blueColor/50 duration-300 hover:bg-blueColor"
               >
                 <social.icon className="cursor-pointer text-white" />
               </Link>
@@ -92,7 +92,7 @@ const Footer = () => {
         </div>
         <div className="flex gap-12">
           <div className="flex flex-col gap-2">
-            <p className="font-bold text-xl">{t("usefulLinks")}</p>
+            <p className="text-xl font-bold">{t("usefulLinks")}</p>
             {usefulLinks.map((link) => (
               <Link href={link.link} key={link.id}>
                 {t(link.name)}
@@ -100,7 +100,7 @@ const Footer = () => {
             ))}
           </div>
           <div className="flex flex-col gap-2">
-            <p className="font-bold text-xl">{t("pages")}</p>
+            <p className="text-xl font-bold">{t("pages")}</p>
             {pagesLink.map((link) => (
               <Link href={link.link} key={link.id}>
                 {t(link.name)}
@@ -108,7 +108,7 @@ const Footer = () => {
             ))}
           </div>
         </div>
-        <p className="font-bold text-blueColor w-full text-center">
+        <p className="w-full text-center font-bold text-blueColor">
           {t("copyright")} &copy; {new Date().getFullYear()}.
         </p>
       </div>

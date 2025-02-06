@@ -1,27 +1,27 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { IoIosArrowDown } from 'react-icons/io';
+import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
+import { IoIosArrowDown } from "react-icons/io";
 
-
-export  default function LanguageOptions() {
+export default function LanguageOptions() {
+  const [isRendered, setIsRendered] = useState(false);
   const { i18n, t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
 
   const languages = [
-    { code: 'en', name: t('language.en') },
-    { code: 'ar', name: t('language.ar') },
-    { code: 'fr', name: t('language.fr') }
+    { code: "en", name: t("language.en") },
+    { code: "ar", name: t("language.ar") },
+    { code: "fr", name: t("language.fr") },
   ];
 
   const changeLanguage = (lng: string) => {
     i18n.changeLanguage(lng);
-    localStorage.setItem('language', lng);
+    localStorage.setItem("language", lng);
     setIsOpen(false);
   };
 
-  const currentLanguage = languages.find(lang => lang.code === i18n.language);
+  const currentLanguage = languages.find((lang) => lang.code === i18n.language);
 
   useEffect(() => {
     setIsRendered(true);
@@ -31,8 +31,8 @@ export  default function LanguageOptions() {
   }
   return (
     <div className="relative">
-      <div 
-        onClick={() => setIsOpen(!isOpen)} 
+      <div
+        onClick={() => setIsOpen(!isOpen)}
         className="flex cursor-pointer items-center gap-2"
       >
         {currentLanguage?.name}
@@ -44,10 +44,7 @@ export  default function LanguageOptions() {
             <div
               key={lang.code}
               onClick={() => changeLanguage(lang.code)}
-              className={`
-                cursor-pointer px-4 py-2 
-                ${i18n.language === lang.code ? 'bg-blueColor text-white' : 'hover:bg-gray-100'}
-              `}
+              className={`cursor-pointer px-4 text-black py-2 ${i18n.language === lang.code ? "bg-blueColor !text-white" : "hover:bg-gray-100"} `}
             >
               {lang.name}
             </div>

@@ -3,7 +3,7 @@ import customAxios from "@/utils/customAxios";
 import PropertyCard from "../propertyCard/PropertyCard";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { useTranslation } from "next-i18next";
+import { useTranslation } from "react-i18next";
 
 const Properties = () => {
   const { t } = useTranslation();
@@ -36,7 +36,7 @@ const Properties = () => {
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
-          {properties?.map((property:any) => (
+          {properties?.map((property: any) => (
             <PropertyCard key={property.id} property={property} />
           ))}
         </div>
