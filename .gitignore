@@ -1,2 +1,7 @@
 /node_modules
 instuctions.sql
+.env
+.local.env
+.env.local
+.env*
+!.env.example

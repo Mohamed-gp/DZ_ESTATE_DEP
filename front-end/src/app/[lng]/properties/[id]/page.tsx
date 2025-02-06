@@ -80,11 +80,13 @@ const SingleProperty = () => {
       setDaysCount(dif / 1000 / 3600 / 24);
     }
   }, [state]);
+
   const messageHouseHandler = async () => {
     try {
-      const { data } = await customAxios.post(
-        `/properties/${property?.id}/chat`,
-      );
+      const { data } = await customAxios.post(`/chat/rooms`, {
+        propertyId: id,
+        firstUserId: user?.id,
+      });
       toast.success(data.message);
     } catch (error) {
       console.log(error);
