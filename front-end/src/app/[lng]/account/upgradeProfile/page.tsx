@@ -1,7 +1,20 @@
+"use client";
+import customAxios from "@/utils/customAxios";
 import React from "react";
+import toast from "react-hot-toast";
 import { FaCheck, FaStar } from "react-icons/fa";
 
 const page = () => {
+  const upgradeProfile = async () => {
+    try {
+      const { data } = await customAxios.post("/user/upgradeprofile");
+      console.log(data);
+      toast.success(data.message);
+      window.open(data.url, "_blank");
+    } catch (error) {
+      toast.error(error.response.data.message);
+    }
+  };
   return (
     <section className="mx-auto min-h-screen max-w-5xl px-4 py-16">
       <h2 className="mb-8 text-center text-3xl font-bold">Choose Your Plan</h2>
@@ -41,7 +54,10 @@ const page = () => {
             </ul>
           </div>
 
-          <button className="w-full rounded-md border border-gray-300 px-4 py-2 transition-colors hover:bg-gray-50">
+          <button
+            disabled
+            className="w-full rounded-md border border-gray-300 px-4 py-2 transition-colors hover:bg-gray-50 disabled:opacity-50"
+          >
             Get Started
           </button>
         </div>
@@ -103,7 +119,10 @@ const page = () => {
             </ul>
           </div>
 
-          <button className="w-full rounded-md bg-blue-500 px-4 py-2 text-white transition-colors hover:bg-blue-600">
+          <button
+            onClick={() => upgradeProfile()}
+            className="w-full rounded-md bg-blue-500 px-4 py-2 text-white transition-colors hover:bg-blue-600"
+          >
             Upgrade to Premium
           </button>
         </div>

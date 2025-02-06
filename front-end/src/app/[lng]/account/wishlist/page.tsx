@@ -24,6 +24,7 @@ export default function PropertiesPage() {
       setProperties(data.data);
       console.log(data.data);
     } catch (error) {
+      
       toast.error(error.response.data.message);
     } finally {
       setLoading(false);

@@ -13,28 +13,43 @@ import Link from "next/link";
 interface PropertyCardProps {
   property: any;
   onFavorite?: (id: string) => void;
+  getProperties?: any;
 }
 
-const PropertyCard = ({ property }: PropertyCardProps) => {
+const PropertyCard = ({ property, getProperties }: PropertyCardProps) => {
   const { user } = useBoundStore();
   const [imageError, setImageError] = useState(false);
   const [imageLoading, setImageLoading] = useState(true);
   const [remove, setRemove] = useState(0);
+  const [wishlist, setWishlist] = useState<any[]>([]);
+
+  const getwishlist = async () => {
+    try {
+      const { data } = await customAxios.get(`/user/wishlist`);
+      console.log(data.data);
+      setWishlist(data.data);
+    } catch (error) {
+      toast.error(error?.response?.data.message);
+    }
+  };
+  useEffect(() => {
+    if (user) {
+      getwishlist();
+    }
+  }, []);
+  const handleFavorite = async (id: string) => {
+    try {
+      const { data } = await customAxios.post(`/user/wishlist/toggle/${id}`);
+      setWishlist(data.data);
+    } catch (error) {
+      toast.error(error?.response?.data.message);
+    }
+  };
 
   const statusColor =
     property.status === "rent"
       ? "bg-blue-500 text-white"
       : "bg-green-500 text-white";
-
-  const handleFavorite = (id: string) => {
-    // setProperties(
-    //   properties?.map((property) =>
-    //     property.id === id
-    //       ? { ...property, isFavorite: !property.isFavorite }
-    //       : property,
-    //   ),
-    // );
-  };
 
   const removeHandler = (id) => {
     Swal.fire({
@@ -48,14 +63,13 @@ const PropertyCard = ({ property }: PropertyCardProps) => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await customAxios.delete(`/properties/${id}`);
+          await customAxios.delete(`/admin/properties/${id}`);
           Swal.fire({
             title: "Deleted!",
             text: "Property Deleted Successfuly",
             icon: "success",
           });
-
-          setRemove((prev) => prev + 1);
+          getProperties();
         } catch (error) {
           console.log(error);
           toast.error(error?.response?.data.message);
@@ -85,7 +99,7 @@ const PropertyCard = ({ property }: PropertyCardProps) => {
         >
           <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
         </div>
-        {property?.assets.map((asset: any, index: number) => {
+        {property?.assets?.map((asset: any, index: number) => {
           return (
             <div key={uuid()}>
               {property?.assets[index]?.type == "image" && (
@@ -104,17 +118,25 @@ const PropertyCard = ({ property }: PropertyCardProps) => {
         })}
 
         {/* Favorite Button */}
-        <button
-          onClick={() => handleFavorite(property.id)}
-          className="absolute right-3 top-3 z-10 rounded-full bg-white/90 p-2 shadow-md transition-all hover:scale-110 hover:bg-white"
-        >
-          <Heart
-            className={`h-5 w-5 duration-300 hover:fill-red-500 hover:text-red-500 ${property.isFavorite ? "fill-red-500 text-red-500" : "text-gray-600"}`}
-          />
-        </button>
-        {property?.owner_id == user?.id && (
+        {user?.id == property?.owner_id && (
           <button
-            onClick={() => removeHandler(property.id)}
+            onClick={(e) => {
+              e.preventDefault();
+              handleFavorite(property?.id);
+            }}
+            className="absolute right-3 top-3 z-10 rounded-full bg-white/90 p-2 shadow-md transition-all hover:scale-110 hover:bg-white"
+          >
+            <Heart
+              className={`h-5 w-5 duration-300 hover:fill-red-500 hover:text-red-500 ${property.isFavorite ? "fill-red-500 text-red-500" : "text-gray-600"}`}
+            />
+          </button>
+        )}
+        {(property?.owner_id == user?.id || user?.role == "admin") && (
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              removeHandler(property.id);
+            }}
             className="absolute right-14 top-3 z-10 rounded-full bg-white/90 p-2 shadow-md transition-all hover:scale-110 hover:bg-white"
           >
             <Trash className={`h-5 w-5`} />
@@ -170,7 +192,7 @@ const PropertyCard = ({ property }: PropertyCardProps) => {
               <Folder className="h-4 w-4 text-blue-600" />
             </div>
             <div className="text-sm">
-              <span className="font-medium">{property?.category.name}</span>
+              <span className="font-medium">{property?.category?.name}</span>
             </div>
           </div>
         </div>

@@ -21,7 +21,8 @@ export default function PropertiesPage() {
   const fetchProperties = async () => {
     try {
       setLoading(true);
-      const { data } = await customAxios.get(`/properties/users/${user.id}`);
+      const { data } = await customAxios.get(`/admin/properties`);
+      console.log(data.data, "test");
       console.log(data);
       setProperties(data.data);
     } catch (error) {
@@ -36,7 +37,7 @@ export default function PropertiesPage() {
   }, []); // Added searchQuery to dependencies
 
   const filteredProperties = properties?.filter((property) =>
-    property.title.toLowerCase().includes(searchQuery.toLowerCase()),
+    property?.title?.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   const itemsPerPage = 6;
@@ -78,17 +79,6 @@ export default function PropertiesPage() {
       ) : (
         <>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            <Link href="/properties/add" className="block">
-              <div className="flex h-full min-h-[300px] flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-200 bg-white p-6 text-center hover:border-gray-400 hover:bg-gray-50">
-                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-gray-100">
-                  <Plus className="h-6 w-6 text-gray-600" />
-                </div>
-                <h3 className="mt-4 text-sm font-medium text-gray-900">
-                  Add Your Property
-                </h3>
-              </div>
-            </Link>
-
             {paginatedProperties?.map((property) => (
               <div key={property.id} className="relative">
                 <PropertyCard

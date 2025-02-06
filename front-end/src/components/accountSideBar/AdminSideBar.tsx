@@ -65,6 +65,11 @@ const AdminSideBar = () => {
     { name: "Users", link: "/admin/users", icon: FaUsers },
 
     {
+      name: "Posts",
+      link: "/admin/posts",
+      icon: FaFile,
+    },
+    {
       name: "Categories",
       link: "/admin/categories",
       icon: FaListAlt,

@@ -54,7 +54,7 @@ const handleRefreshToken = async (
             .json({ message: "Invalid token login again", data: null });
         }
         const accessToken = jwt.sign({ id: decoded.id }, ACCESS_TOKEN_SECRET, {
-          expiresIn: "1h",
+          expiresIn: "24h",
         });
         return res
           .status(200)
@@ -112,7 +112,7 @@ const registerController = async (
     const accessToken = jwt.sign(
       { id: newUser.rows[0].id },
       process.env.ACCESS_TOKEN_SECRET,
-      { expiresIn: "1h" }
+      { expiresIn: "24h" }
     );
     const refreshToken = jwt.sign(
       { id: newUser.rows[0].id },
@@ -179,7 +179,7 @@ const googleSignInController = async (
       const accessToken = jwt.sign(
         { id: user.id },
         process.env.ACCESS_TOKEN_SECRET,
-        { expiresIn: "1h" }
+        { expiresIn: "24h" }
       );
       const refreshToken = jwt.sign(
         { id: user.id },
@@ -234,7 +234,7 @@ const googleSignInController = async (
         { id: newUser.id, role: newUser.role },
         process.env.ACCESS_TOKEN_SECRET as string,
         {
-          expiresIn: "1h",
+          expiresIn: "24h",
         }
       );
       const refreshToken = jwt.sign(
@@ -314,7 +314,7 @@ const loginController = async (
     const accessToken = jwt.sign(
       { id: user.rows[0].id },
       process.env.ACCESS_TOKEN_SECRET,
-      { expiresIn: "1h" }
+      { expiresIn: "24h" }
     );
     const refreshToken = jwt.sign(
       { id: user.rows[0].id },
