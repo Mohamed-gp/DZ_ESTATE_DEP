@@ -2,28 +2,27 @@ import multer from "multer";
 import cloudinary from "../config/cloudinary";
 import { NextFunction, Request, Response } from "express";
 import pool from "../config/connectDb";
-// am gonna add chargily later since it don't work with typescript 
+// am gonna add chargily later since it don't work with typescript
 // import Chargily from "@chargily/chargily-pay";
 import Stripe from "stripe";
 import { authRequest } from "../interfaces/authInterface";
 import removefiles from "../utils/cleanUpload";
 import { validateCreateProperty } from "../utils/joiValidation";
 
-
-
 // const client = new Chargily.ChargilyClient({
 //   api_key: process.env.CHARGILY_SECRET_KEY,
 //   mode: "test",
 // });
 
-
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
   apiVersion: "2024-12-18.acacia",
 });
 
-
-
-const addPropertyController = async (req: authRequest, res: Response, next: NextFunction) => {
+const addPropertyController = async (
+  req: authRequest,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { error } = validateCreateProperty(req.body);
     if (error) {
@@ -33,32 +32,52 @@ const addPropertyController = async (req: authRequest, res: Response, next: Next
       });
     }
 
-    const { title, description, price, status, commune, quartier, wilaya, longitude, latitude, guests, bedrooms, bathrooms, category,features } = req.body;
-    
-    console.log(features,"this is a features");
-    return ;
+    const {
+      title,
+      description,
+      price,
+      status,
+      commune,
+      quartier,
+      wilaya,
+      longitude,
+      latitude,
+      guests,
+      bedrooms,
+      bathrooms,
+      category,
+      features,
+    } = req.body;
     const files = req.files as Express.Multer.File[];
 
-    // Vérifier le nombre minimum de fichiers (images ou vidéos)
-    if (files.length < 6) {
+    // Séparer les fichiers images et vidéos selon leur type MIME
+    const imageFiles = files.filter((file) =>
+      file.mimetype.startsWith("image/")
+    );
+    const videoFiles = files.filter((file) =>
+      file.mimetype.startsWith("video/")
+    );
+
+    // Vérifier le nombre minimum de fichiers images
+    if (imageFiles.length < 6) {
       return res.status(400).json({
-        message: "You must upload at least 6 files (images or videos)",
+        message: "You must upload at least 6 image files",
         data: null,
       });
     }
 
-    // Séparer les fichiers images et vidéos selon leur type MIME
-    const imageFiles = files.filter((file) => file.mimetype.startsWith("image/"));
-    const videoFiles = files.filter((file) => file.mimetype.startsWith("video/"));
-
     // Uploader les images
     const uploadedImages = await Promise.all(
-      imageFiles.map((image) => cloudinary.uploader.upload(image.path, { resource_type: "image" }))
+      imageFiles.map((image) =>
+        cloudinary.uploader.upload(image.path, { resource_type: "image" })
+      )
     );
 
     // Uploader les vidéos
     const uploadedVideos = await Promise.all(
-      videoFiles.map((video) => cloudinary.uploader.upload(video.path, { resource_type: "video" }))
+      videoFiles.map((video) =>
+        cloudinary.uploader.upload(video.path, { resource_type: "video" })
+      )
     );
 
     const createdProperty = await pool.query(
@@ -66,7 +85,22 @@ const addPropertyController = async (req: authRequest, res: Response, next: Next
       (title, description, price, status, commune, quartier, wilaya, longitude, latitude, guests, bedrooms, bathrooms, owner_id, category_id, created_at, updated_at) 
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP) 
       RETURNING *`,
-      [title, description, price, status, commune, quartier, +wilaya, +longitude, +latitude, 2, bedrooms, bathrooms, req.user.id, 2]
+      [
+        title,
+        description,
+        price,
+        status,
+        commune,
+        quartier,
+        +wilaya,
+        +longitude,
+        +latitude,
+        guests,
+        bedrooms,
+        bathrooms,
+        req.user.id,
+        category,
+      ]
     );
 
     const propertyId = createdProperty.rows[0].id;
@@ -89,22 +123,33 @@ const addPropertyController = async (req: authRequest, res: Response, next: Next
       );
     }
 
+    // Ajouter les features dans la table `property_features`
+    const featureIds = features.map((featureId: string) =>
+      parseInt(featureId, 10)
+    );
+    for (const featureId of featureIds) {
+      await pool.query(
+        `INSERT INTO property_features (property_id, feature_id) 
+        VALUES ($1, $2) RETURNING *`,
+        [propertyId, featureId]
+      );
+    }
+
     // Nettoyer les fichiers temporaires (facultatif)
     removefiles();
 
     return res.status(201).json({
       data: createdProperty.rows[0],
-      message: "Property added successfully with images and videos",
+      message: "Property added successfully with images, videos, and features",
     });
   } catch (error) {
     next(error);
   }
 };
 
-
-
 const getProperties = async (req: Request, res: Response) => {
-  let { category, minPrice, maxPrice, page, limit, status, keyword } = req.query;
+  let { category, minPrice, maxPrice, page, limit, status, keyword } =
+    req.query;
 
   let query = `
     SELECT 
@@ -131,7 +176,10 @@ const getProperties = async (req: Request, res: Response) => {
   }
 
   if (category) {
-    const categoryResult = await pool.query("SELECT id FROM categories WHERE name = $1", [category]);
+    const categoryResult = await pool.query(
+      "SELECT id FROM categories WHERE name = $1",
+      [category]
+    );
     if (categoryResult.rows.length > 0) {
       query += ` AND category_id = $${index}`;
       queryValues.push(categoryResult.rows[0].id);
@@ -169,15 +217,17 @@ const getProperties = async (req: Request, res: Response) => {
 
   try {
     const properties = await pool.query(query, queryValues);
-    return res.json({ data: properties.rows, message: "Properties fetched successfully" });
+    return res.json({
+      data: properties.rows,
+      message: "Properties fetched successfully",
+    });
   } catch (error) {
     console.error("Error fetching properties:", error);
-    return res.status(500).json({ message: "An error occurred while fetching properties" });
+    return res
+      .status(500)
+      .json({ message: "An error occurred while fetching properties" });
   }
 };
-
-
-
 
 const getProperty = async (req: Request, res: Response) => {
   const { id } = req.params;
@@ -211,30 +261,37 @@ const getProperty = async (req: Request, res: Response) => {
       return res.status(404).json({ message: "Property not found" });
     }
 
-    return res.json({ data: property.rows[0], message: "Property fetched successfully" });
+    return res.json({
+      data: property.rows[0],
+      message: "Property fetched successfully",
+    });
   } catch (error) {
     console.error("Error fetching property:", error);
-    return res.status(500).json({ message: "An error occurred while fetching the property" });
+    return res
+      .status(500)
+      .json({ message: "An error occurred while fetching the property" });
   }
 };
 
-
-
 const getRecommendedProperties = async (req: Request, res: Response) => {
-  const properties = await pool.query("SELECT * FROM properties ORDER BY RANDOM() LIMIT 8");
+  const properties = await pool.query(
+    "SELECT * FROM properties ORDER BY RANDOM() LIMIT 8"
+  );
   if (!properties.rows[0]) {
     return res.json({ message: "No property found", data: null });
   }
-  return res.json({ data: properties.rows, message: "Properties fetched successfully" });
+  return res.json({
+    data: properties.rows,
+    message: "Properties fetched successfully",
+  });
 };
-
-
-
 
 const reserveProperty = async (req: Request, res: Response) => {
   const { id } = req.params;
   const { userId } = req.body;
-  const property = await pool.query("SELECT * FROM properties WHERE id = $1", [id]);
+  const property = await pool.query("SELECT * FROM properties WHERE id = $1", [
+    id,
+  ]);
   if (!property.rows[0]) {
     return res.json({ message: "Property not found" });
   }
@@ -242,7 +299,10 @@ const reserveProperty = async (req: Request, res: Response) => {
     "INSERT INTO reserved_properties (property_id, user_id) VALUES ($1, $2) RETURNING *",
     [id, userId]
   );
-  return res.json({ data: reservedProperty.rows[0], message: "Property reserved successfully" });
+  return res.json({
+    data: reservedProperty.rows[0],
+    message: "Property reserved successfully",
+  });
 };
 
 // const addReservationWithChargily = async (req: authRequest, res: Response) => {
@@ -328,7 +388,9 @@ const addReservationWithStripe = async (req: authRequest, res: Response) => {
       });
     }
 
-    const home = await pool.query("SELECT * FROM homes WHERE id = $1", [homeId]);
+    const home = await pool.query("SELECT * FROM homes WHERE id = $1", [
+      homeId,
+    ]);
     if (!home.rows[0]) {
       return res.status(404).json({ message: "Home not found", data: null });
     }
@@ -349,7 +411,9 @@ const addReservationWithStripe = async (req: authRequest, res: Response) => {
       [checkIn, checkOut, userId, homeId]
     );
 
-    const days = Math.ceil((checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24));
+    const days = Math.ceil(
+      (checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24)
+    );
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
@@ -417,11 +481,16 @@ const createChat = async (req: authRequest, res: Response) => {
 };
 
 const searchHomes = async (req: Request, res: Response) => {
-  const { longitude, latitude, guests, checkIn, checkOut, category } = req.query;
+  const { longitude, latitude, guests, checkIn, checkOut, category } =
+    req.query;
 
   const homes = await pool.query(
     "SELECT * FROM homes WHERE ($1::float IS NULL OR longitude = $1) AND ($2::float IS NULL OR latitude = $2) AND ($3::text IS NULL OR category = $3)",
-    [longitude ? parseFloat(longitude as string) : null, latitude ? parseFloat(latitude as string) : null, category]
+    [
+      longitude ? parseFloat(longitude as string) : null,
+      latitude ? parseFloat(latitude as string) : null,
+      category,
+    ]
   );
 
   res.status(200).json({ data: homes.rows, message: "Fetched successfully" });
@@ -433,14 +502,22 @@ const homePictures = async (req: Request, res: Response) => {
   if (!home.rows[0]) {
     return res.status(404).json({ message: "Home not found", data: null });
   }
-  const pictures = await pool.query("SELECT * FROM pictures WHERE home_id = $1", [id]);
+  const pictures = await pool.query(
+    "SELECT * FROM pictures WHERE home_id = $1",
+    [id]
+  );
   res.status(200).json({ data: pictures.rows, message: null });
 };
 
 const deleteReview = async (req: Request, res: Response) => {
-  const review = await pool.query("DELETE FROM reviews WHERE id = $1 RETURNING *", [req.params.id]);
+  const review = await pool.query(
+    "DELETE FROM reviews WHERE id = $1 RETURNING *",
+    [req.params.id]
+  );
   if (!review.rows[0]) {
-    return res.status(404).json({ message: "Review does not exist", data: null });
+    return res
+      .status(404)
+      .json({ message: "Review does not exist", data: null });
   }
   return res.status(200).json({ message: "Deleted successfully", data: null });
 };
@@ -460,7 +537,9 @@ const addReview = async (req: authRequest, res: Response) => {
     [userId, homeId]
   );
   if (!hasReserved.rows[0]) {
-    return res.status(400).json({ message: "You must reserve this home first", data: null });
+    return res
+      .status(400)
+      .json({ message: "You must reserve this home first", data: null });
   }
 
   const review = await pool.query(
@@ -468,13 +547,23 @@ const addReview = async (req: authRequest, res: Response) => {
     [rating, comment, userId, homeId]
   );
 
-  const reviews = await pool.query("SELECT * FROM reviews WHERE home_id = $1", [homeId]);
-  const totalRating = reviews.rows.reduce((acc, review) => acc + review.rating, 0);
+  const reviews = await pool.query("SELECT * FROM reviews WHERE home_id = $1", [
+    homeId,
+  ]);
+  const totalRating = reviews.rows.reduce(
+    (acc, review) => acc + review.rating,
+    0
+  );
   const averageRating = totalRating / reviews.rows.length;
 
-  await pool.query("UPDATE homes SET rating = $1 WHERE id = $2", [averageRating, homeId]);
+  await pool.query("UPDATE homes SET rating = $1 WHERE id = $2", [
+    averageRating,
+    homeId,
+  ]);
 
-  res.status(200).json({ data: review.rows[0], message: "Review added successfully" });
+  res
+    .status(200)
+    .json({ data: review.rows[0], message: "Review added successfully" });
 };
 
 const allReviews = async (req: Request, res: Response) => {

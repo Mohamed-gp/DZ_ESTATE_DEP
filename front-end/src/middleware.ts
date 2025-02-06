@@ -3,25 +3,29 @@ import { i18nRouter } from "next-i18n-router";
 import i18nConfig from "../i18nConfig";
 
 export function middleware(req: NextRequest) {
+  // Use i18nRouter to handle localization
+  const i18nResponse = i18nRouter(req, i18nConfig);
+  if (i18nResponse) {
+    return i18nResponse;
+  }
+
   // Récupérer le token (depuis les cookies ou le header)
-  return i18nRouter(req, i18nConfig);
   const pathName = req.nextUrl.pathname;
   const token = req.cookies.get("accessToken");
   const isProtectedRoute = pathName.startsWith("/account");
 
   const isAuthRoute =
-    pathName.startsWith("/auth/login") || pathName.startsWith("/auth/register");
+    pathName.match(/^\/[a-z]{2}\/auth\/login$/) ||
+    pathName.match(/^\/[a-z]{2}\/auth\/register$/);
 
   // Vérifiez si l'utilisateur est connecté
   if ((token && isAuthRoute) || (!token && isProtectedRoute)) {
     const url = req.nextUrl.clone();
     url.pathname = "/"; // Redirigez vers le tableau de bord ou une autre page
-    NextResponse.redirect(url);
-    return i18nRouter(req, i18nConfig);
+    return NextResponse.redirect(url);
   }
 
-  NextResponse.next(); // Continuez si aucune condition n'est remplie
-  return i18nRouter(req, i18nConfig);
+  return NextResponse.next(); // Continuez si aucune condition n'est remplie
 }
 
 export const config = {
@@ -31,5 +35,7 @@ export const config = {
     "/auth/register",
     "/auth/login",
     "/((?!api|static|.*\\..*|_next).*)",
+    "/:lng/auth/login",
+    "/:lng/auth/register",
   ],
 };

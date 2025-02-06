@@ -20,8 +20,9 @@ export default function PropertiesPage() {
   const fetchProperties = async () => {
     try {
       setLoading(true);
-      const { data } = await customAxios.get(`/properties/wishlist/${user.id}`);
+      const { data } = await customAxios.get(`/user/wishlist`);
       setProperties(data.data);
+      console.log(data.data);
     } catch (error) {
       toast.error(error.response.data.message);
     } finally {
@@ -76,7 +77,7 @@ export default function PropertiesPage() {
       ) : (
         <>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {paginatedProperties.length === 0 && (
+            {paginatedProperties?.length === 0 && (
               <div className="flex h-full min-h-[300px] flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-200 bg-white p-6 text-center">
                 <h3 className="mt-4 text-sm font-medium text-gray-900">
                   No properties found

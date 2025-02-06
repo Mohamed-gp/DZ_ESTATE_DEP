@@ -74,18 +74,18 @@ const AdminSideBar = () => {
       link: "/admin/features",
       icon: FaTags,
     },
-    {
-      name: "Notifications",
-      link: "/account/notifications",
-      icon: FaBell,
-    },
-    {
-      name: "Inbox",
-      link: "/account/inbox",
-      icon: FaInbox,
-    },
-    { name: "Wishlist", link: "/account/wishlist", icon: FaHeart },
-    { name: "Posts", link: "/account/posts", icon: FaFile },
+    // {
+    //   name: "Notifications",
+    //   link: "/account/notifications",
+    //   icon: FaBell,
+    // },
+    // {
+    //   name: "Inbox",
+    //   link: "/account/inbox",
+    //   icon: FaInbox,
+    // },
+    // { name: "Wishlist", link: "/account/wishlist", icon: FaHeart },
+    // { name: "Posts", link: "/account/posts", icon: FaFile },
 
     // {
     //   name: "Edit Properties",

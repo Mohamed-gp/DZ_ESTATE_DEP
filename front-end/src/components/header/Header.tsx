@@ -43,8 +43,9 @@ const socialLinks = [
 const Header = () => {
   const { t } = useTranslation();
   const { user } = useBoundStore((state) => state);
-  const searchParams = useSearchParams();
   const [isMounted, setIsMounted] = useState(false);
+
+  const searchParams = useSearchParams();
 
   const router = useRouter();
   const searchHandler = (keyword: string) => {
@@ -56,10 +57,15 @@ const Header = () => {
     }
     router.push(`/properties?${params.toString()}`);
   };
-
   useEffect(() => {
     setIsMounted(true);
   }, []);
+  if (!isMounted) {
+    return null;
+  }
+  if (user?.role == "admin") {
+    return null;
+  }
 
   return (
     <header className="flex flex-col">
@@ -106,7 +112,7 @@ const Header = () => {
               />
               <FaMagnifyingGlass className="mr-6" />
             </div>
-            <IoMdOptions className="h-[40px] w-[40px] cursor-pointer rounded-sm bg-blueColor p-2 text-xl text-white" />
+            {/* <IoMdOptions className="h-[40px] w-[40px] cursor-pointer rounded-sm bg-blueColor p-2 text-xl text-white" /> */}
           </div>
           {isMounted && (
             <>
@@ -131,7 +137,7 @@ const Header = () => {
                     href={
                       user?.role == "admin"
                         ? "/admin/analytics"
-                        : "/account/notifications"
+                        : "/account/inbox"
                     }
                     className="relative h-10 w-10 overflow-hidden rounded-full"
                   >

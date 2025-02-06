@@ -17,7 +17,7 @@ const PropertiesAndMapContainer = () => {
       <Suspense fallback={<div>Loading...</div>}>
         <Properties />
       </Suspense>
-      <Map />
+      {/* <Map /> */}
     </section>
   );
 };

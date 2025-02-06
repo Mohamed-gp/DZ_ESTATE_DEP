@@ -4,13 +4,15 @@ import { MdDashboard } from "react-icons/md";
 import { FaBell, FaGear, FaInbox, FaFile, FaHeart } from "react-icons/fa6";
 import toast from "react-hot-toast";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa6";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import customAxios from "@/utils/customAxios";
 import useBoundStore from "@/store/store";
 import { GiUpgrade } from "react-icons/gi";
 
 const SideBar = () => {
+  const pathname = usePathname();
+
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -54,11 +56,11 @@ const SideBar = () => {
     //   link: "/account/dashboard",
     //   icon: MdDashboard,
     // },
-    {
-      name: "Notifications",
-      link: "/account/notifications",
-      icon: FaBell,
-    },
+    // {
+    //   name: "Notifications",
+    //   link: "/account/notifications",
+    //   icon: FaBell,
+    // },
     {
       name: "Inbox",
       link: "/account/inbox",
@@ -95,6 +97,10 @@ const SideBar = () => {
     }
   };
 
+  useEffect(() => {
+    const index = menuItems.findIndex((item) => item.link === pathname);
+    setActiveIndex(index);
+  }, [pathname]);
   return (
     <>
       <aside

@@ -23,7 +23,9 @@ import {
   Globe,
   DollarSign,
 } from "lucide-react";
-import { LANGUAGES_OPTIONS } from "@/utils/data";
+import { useTranslation } from "react-i18next";
+import { usePathname, useRouter } from "next/navigation";
+import i18nConfig from "../../../../../i18nConfig";
 
 export default function ProfileSettingsPage() {
   const { user, language, changeLanguage, setUser } = useBoundStore(
@@ -57,6 +59,42 @@ export default function ProfileSettingsPage() {
     }
   };
 
+  const [isRendered, setIsRendered] = useState(false);
+  const { i18n } = useTranslation();
+  const currentLocale = i18n.language;
+  const router = useRouter();
+  const currentPathname = usePathname();
+
+  useEffect(() => {
+    console.log(i18n);
+  }, [i18n.languages]);
+  const handleChange = (newLocale) => {
+    // set cookie for next-i18n-router
+    const days = 30;
+    const date = new Date();
+    date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
+    const expires = date.toUTCString();
+    document.cookie = `NEXT_LOCALE=${newLocale};expires=${expires};path=/`;
+
+    // redirect to the new locale path
+    if (
+      currentLocale === i18nConfig.defaultLocale &&
+      !i18nConfig.prefixDefault
+    ) {
+      router.push("/" + newLocale + currentPathname);
+    } else {
+      router.push(
+        currentPathname.replace(`/${currentLocale}`, `/${newLocale}`),
+      );
+    }
+
+    router.refresh();
+  };
+
+  useEffect(() => {
+    setIsRendered(true);
+  }, []);
+  if (!isRendered) return null;
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
@@ -145,12 +183,12 @@ export default function ProfileSettingsPage() {
             <Select
               defaultValue={language}
               onValueChange={(value) => {
-                changeLanguage(value);
+                handleChange(value);
               }}
             >
               <SelectTrigger className="mt-1 block w-full focus-visible:ring-transparent" />
               <SelectContent>
-                {LANGUAGES_OPTIONS.map((option) => (
+                {i18nConfig.locales.map((option) => (
                   <SelectItem key={option} value={option}>
                     {option}
                   </SelectItem>

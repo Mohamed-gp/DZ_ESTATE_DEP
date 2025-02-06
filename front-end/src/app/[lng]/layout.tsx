@@ -9,6 +9,7 @@ import SocketConnectClient from "@/components/socketConnectClient/SocketConnectC
 import { Suspense } from "react";
 import TranslationsProvider from "@/components/TranslationsProvider/TranslationsProvider";
 import initTranslations from "../i18n";
+import useBoundStore from "@/store/store";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",

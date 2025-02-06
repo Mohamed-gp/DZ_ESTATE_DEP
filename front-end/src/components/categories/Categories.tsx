@@ -39,7 +39,7 @@ const Categories = () => {
   };
 
   return (
-    <div className="categories flex flex-1 items-end justify-evenly overflow-x-auto">
+    <div className="categories flex flex-1 py-2 items-end justify-evenly overflow-x-auto">
       {categories.map((category: any, index) => (
         <div
           key={index}

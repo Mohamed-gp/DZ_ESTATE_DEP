@@ -7,7 +7,7 @@ const CategoriesAndFilterContainer = () => {
       <Suspense fallback={<div>Loading...</div>}>
         <Categories />
       </Suspense>
-      <PropertiesFilter />
+      {/* <PropertiesFilter /> */}
     </div>
   );
 };

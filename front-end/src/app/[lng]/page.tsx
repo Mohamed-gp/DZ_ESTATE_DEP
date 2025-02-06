@@ -4,6 +4,8 @@ import Publicité from "@/components/publicité/Publicité";
 // import Sponsorisées from "@/components/sponsorisées/Sponsorisées";
 import PropertiesForRent from "@/components/propertiesForRent/PropertiesForRent";
 import PropertiesForSell from "@/components/propertiesForSell/PropertiesForSell";
+import ContactUs from "@/components/contactUs/ContactUs";
+import Subscribe from "@/components/Subscribe/Subscribe";
 
 export default function Home() {
   return (
@@ -14,6 +16,8 @@ export default function Home() {
       <Featured />
       <PropertiesForRent />
       <PropertiesForSell />
+      <ContactUs />
+      <Subscribe />
       {/* subscribe */}
     </>
   );
