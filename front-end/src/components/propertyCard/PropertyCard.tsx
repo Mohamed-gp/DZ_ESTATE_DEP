@@ -26,21 +26,23 @@ const PropertyCard = ({ property, getProperties }: PropertyCardProps) => {
   const getwishlist = async () => {
     try {
       const { data } = await customAxios.get(`/user/wishlist`);
-      console.log(data.data);
       setWishlist(data.data);
     } catch (error) {
       toast.error(error?.response?.data.message);
     }
   };
+
   useEffect(() => {
     if (user) {
       getwishlist();
     }
-  }, []);
+  }, [user]);
+
   const handleFavorite = async (id: string) => {
     try {
       const { data } = await customAxios.post(`/user/wishlist/toggle/${id}`);
-      setWishlist(data.data);
+      setWishlist(data.wishlist);
+      toast.success(data.message);
     } catch (error) {
       toast.error(error?.response?.data.message);
     }
@@ -66,7 +68,7 @@ const PropertyCard = ({ property, getProperties }: PropertyCardProps) => {
           await customAxios.delete(`/admin/properties/${id}`);
           Swal.fire({
             title: "Deleted!",
-            text: "Property Deleted Successfuly",
+            text: "Property Deleted Successfully",
             icon: "success",
           });
           getProperties();
@@ -76,16 +78,19 @@ const PropertyCard = ({ property, getProperties }: PropertyCardProps) => {
         }
       } else {
         Swal.fire({
-          title: "your profile is safe!",
-          text: "something went wrong",
+          title: "Your profile is safe!",
+          text: "Something went wrong",
           icon: "error",
         });
       }
     });
   };
+
   useEffect(() => {
     // getAllPropertiesHandler();
   }, [remove]);
+
+  const isFavorite = wishlist?.some((item) => item.id === property.id);
 
   return (
     <Link
@@ -95,7 +100,9 @@ const PropertyCard = ({ property, getProperties }: PropertyCardProps) => {
       {/* Image Container */}
       <div className="relative aspect-[4/3] overflow-hidden">
         <div
-          className={`absolute inset-0 z-10 flex items-center justify-center bg-gray-100 ${imageLoading ? "block" : "hidden"} `}
+          className={`absolute inset-0 z-10 flex items-center justify-center bg-gray-100 ${
+            imageLoading ? "block" : "hidden"
+          } `}
         >
           <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
         </div>
@@ -107,7 +114,9 @@ const PropertyCard = ({ property, getProperties }: PropertyCardProps) => {
                   src={property?.assets[0]?.url}
                   alt={property?.title}
                   fill
-                  className={`object-cover transition-transform duration-300 ease-in-out group-hover:scale-110 ${imageLoading ? "opacity-0" : "opacity-100"} `}
+                  className={`object-cover transition-transform duration-300 ease-in-out group-hover:scale-110 ${
+                    imageLoading ? "opacity-0" : "opacity-100"
+                  } `}
                   onLoadingComplete={() => setImageLoading(false)}
                   // onError={() => setImageError(true)}
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
@@ -118,7 +127,7 @@ const PropertyCard = ({ property, getProperties }: PropertyCardProps) => {
         })}
 
         {/* Favorite Button */}
-        {user?.id == property?.owner_id && (
+        {user?.id && (
           <button
             onClick={(e) => {
               e.preventDefault();
@@ -127,7 +136,9 @@ const PropertyCard = ({ property, getProperties }: PropertyCardProps) => {
             className="absolute right-3 top-3 z-10 rounded-full bg-white/90 p-2 shadow-md transition-all hover:scale-110 hover:bg-white"
           >
             <Heart
-              className={`h-5 w-5 duration-300 hover:fill-red-500 hover:text-red-500 ${property.isFavorite ? "fill-red-500 text-red-500" : "text-gray-600"}`}
+              className={`h-5 w-5 duration-300 hover:fill-red-500 hover:text-red-500 ${
+                isFavorite ? "fill-red-500 text-red-500" : "text-gray-600"
+              }`}
             />
           </button>
         )}
