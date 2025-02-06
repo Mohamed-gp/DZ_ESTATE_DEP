@@ -1,13 +1,21 @@
 import { Router } from "express";
-import { sendMessageController,getUserConversationsController,getMessagesController } from "../../controllers/chatControllers";
+import {
+  sendMessageController,
+  getUserConversationsController,
+  getMessagesController,
+  createRoomController,
+} from "../../controllers/chatControllers";
+import { verifyAccessToken } from "../../middlewares/verifyToken";
 
 const chatRouter = Router();
 
-
-chatRouter.route("/sendmessage").post(sendMessageController);
-chatRouter.route("/getallconverstaions").get(getUserConversationsController);
-chatRouter.route("/getmessages").get(getMessagesController);
-
+chatRouter.post("/rooms", verifyAccessToken, createRoomController);
+chatRouter.post("/messages/send", verifyAccessToken, sendMessageController);
+chatRouter.get("/messages/:room_id", verifyAccessToken, getMessagesController);
+chatRouter.get(
+  "/conversations",
+  verifyAccessToken,
+  getUserConversationsController
+);
 
 export default chatRouter;
-

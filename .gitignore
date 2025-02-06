@@ -1,4 +1,12 @@
 /node_modules
 instuctions.sql
+<<<<<<< HEAD
 front-end/.env
 back-end/.env
+=======
+.env
+.local.env
+.env.local
+.env*
+!.env.example
+>>>>>>> a974af2a843b9694a0e98055f710dca7885eddec

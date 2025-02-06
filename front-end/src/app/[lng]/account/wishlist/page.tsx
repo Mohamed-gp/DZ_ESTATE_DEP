@@ -11,6 +11,7 @@ import PropertyCard from "@/components/propertyCard/PropertyCard";
 
 export default function PropertiesPage() {
   const [properties, setProperties] = useState<any[]>([]);
+  
 
   const [searchQuery, setSearchQuery] = useState("");
   const [page, setPage] = useState(1);
