@@ -9,7 +9,6 @@ import SocketConnectClient from "@/components/socketConnectClient/SocketConnectC
 import { Suspense } from "react";
 import TranslationsProvider from "@/components/TranslationsProvider/TranslationsProvider";
 import initTranslations from "../i18n";
-import useBoundStore from "@/store/store";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -34,9 +33,9 @@ export default async function RootLayout({
   children: React.ReactNode;
   params: { lng: string };
 }>) {
-  const { lng } = await params;
+  const { lng } = params;
   const i18Namespace = ["translation"];
-  const { t, resources } = await initTranslations(lng, i18Namespace);
+  const { resources } = await initTranslations(lng, i18Namespace);
   return (
     <html lang={lng} className={lng === "ar" ? "rtl" : ""}>
       <body

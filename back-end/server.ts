@@ -1,6 +1,6 @@
 import dotenv from "dotenv"
 dotenv.config();
-import express,{Request,Response,NextFunction}  from "express"
+import express,{Response,NextFunction}  from "express"
 import {connectToDB} from "./config/connectDb";
 import router from "./routes/index";
 import  cookiesParser from "cookie-parser";
@@ -14,7 +14,6 @@ import {socketInit} from "./socket/socket"
 import {createServer} from "http"
 import { ioResponse } from "./interfaces/authInterface";
 import morgan from "morgan"
-import session from "express-session"
 
 
 
@@ -46,12 +45,12 @@ app.use(helmet());
 
 // app.use(xss());
 
-// app.use(
-//   rateLimiting({
-//     windowMs: 10 * 60 * 1000,
-//     max: 500,
-//   })
-// );
+app.use(
+  rateLimiting({
+    windowMs: 10 * 60 * 1000,
+    max: 1000,
+  })
+);
 
 
 
