@@ -1,41 +1,43 @@
 "use client";
-import { FaInstagram, FaMagnifyingGlass } from "react-icons/fa6";
+import {
+  Facebook,
+  Instagram,
+  Linkedin,
+  Twitter,
+  Search,
+  PlusCircle,
+} from "lucide-react";
 import Image from "next/image";
 import logo from "../../../public/logo.svg";
 import Link from "next/link";
-import { FaFacebookF, FaXTwitter } from "react-icons/fa6";
-import { FaLinkedinIn } from "react-icons/fa";
-import { IoMdAddCircleOutline, IoMdOptions } from "react-icons/io";
-
 import LanguageOptions from "@/components/languageOptions/LanguageOptions";
 import useBoundStore from "@/store/store";
-import { useEffect, useState } from "react";
-import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslation } from "react-i18next";
-import initTranslations from "@/app/i18n";
+
 const socialLinks = [
   {
     name: "LinkedIn",
     link: "https://www.linkedin.com/",
-    icon: FaLinkedinIn,
+    icon: Linkedin,
     id: "linkedinId",
   },
   {
     name: "Twitter",
     link: "https://twitter.com/",
-    icon: FaXTwitter,
+    icon: Twitter,
     id: "twitterId",
   },
   {
     name: "Facebook",
     link: "https://www.facebook.com/",
-    icon: FaFacebookF,
+    icon: Facebook,
     id: "facebookId",
   },
   {
     name: "Instagram",
     link: "https://www.instagram.com/",
-    icon: FaInstagram,
+    icon: Instagram,
     id: "instagramId",
   },
 ];
@@ -43,11 +45,9 @@ const socialLinks = [
 const Header = () => {
   const { t } = useTranslation();
   const { user } = useBoundStore((state) => state);
-  const [isMounted, setIsMounted] = useState(false);
-
   const searchParams = useSearchParams();
-
   const router = useRouter();
+
   const searchHandler = (keyword: string) => {
     const params = new URLSearchParams(searchParams.toString());
     if (keyword) {
@@ -57,12 +57,7 @@ const Header = () => {
     }
     router.push(`/properties?${params.toString()}`);
   };
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-  if (!isMounted) {
-    return null;
-  }
+
   if (user?.role == "admin") {
     return null;
   }
@@ -73,18 +68,25 @@ const Header = () => {
         <div className="container flex flex-col items-center justify-between text-center sm:text-left lg:flex-row">
           <p className="text-sm">{t("welcome")}</p>
           <div className="flex flex-col-reverse items-center gap-6 sm:flex-row">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               <p>{t("follow_us")}</p>
-              {socialLinks.map((socialLink) => (
-                <a
-                  key={socialLink.id}
-                  href={socialLink.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <socialLink.icon className="text-white" />
-                </a>
-              ))}
+              <div className="flex gap-2">
+                {socialLinks.map((socialLink) => (
+                  <a
+                    key={socialLink.id}
+                    href={socialLink.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex h-6 w-6 items-center justify-center rounded-full bg-white/20 p-1 transition-colors hover:bg-white/30"
+                  >
+                    <socialLink.icon
+                      size={14}
+                      className="text-white"
+                      strokeWidth={2.5}
+                    />
+                  </a>
+                ))}
+              </div>
             </div>
             <span className="hidden h-6 w-[1px] bg-white opacity-50 sm:inline-block"></span>
             <div className="menus flex gap-6">
@@ -95,6 +97,8 @@ const Header = () => {
           </div>
         </div>
       </div>
+
+      {/* Rest of your header remains unchanged */}
       <div className="header-bottom bg-white py-6">
         <div className="container flex flex-wrap items-center justify-between gap-y-6">
           <Link href={"/"} className="logo mx-auto flex items-center">
@@ -110,50 +114,48 @@ const Header = () => {
                 className="h-full w-[50%] flex-1 px-4 focus:outline-none"
                 placeholder={t("search_placeholder")}
               />
-              <FaMagnifyingGlass className="mr-6" />
+              <Search className="mr-6" />
             </div>
-            {/* <IoMdOptions className="h-[40px] w-[40px] cursor-pointer rounded-sm bg-blueColor p-2 text-xl text-white" /> */}
           </div>
-          {isMounted && (
-            <>
-              {user === null ? (
-                <div className="mx-auto flex items-center gap-2">
-                  <Link href={"/auth/login"} className="border px-6 py-2">
-                    {t("login")}
-                  </Link>
-                  <Link
-                    href={"/auth/register"}
-                    className="bg-blueColor px-6 py-2 text-white"
-                  >
-                    {t("sign_up")}
-                  </Link>
-                </div>
-              ) : (
-                <div className="flex w-[20%] items-center gap-4">
-                  <Link href={"/properties/add"}>
-                    <IoMdAddCircleOutline className="size-7 cursor-pointer" />
-                  </Link>
-                  <Link
-                    href={
-                      user?.role == "admin"
-                        ? "/admin/analytics"
-                        : "/account/inbox"
-                    }
-                    className="relative h-10 w-10 overflow-hidden rounded-full"
-                  >
-                    <Image
-                      src={user?.profile_image}
-                      alt="Profile picture"
-                      className="rounded-full object-cover"
-                      width={60}
-                      height={60}
-                      unoptimized
-                    />
-                  </Link>
-                </div>
-              )}
-            </>
-          )}
+
+          <>
+            {user === null ? (
+              <div className="mx-auto flex items-center gap-2">
+                <Link href={"/auth/login"} className="border px-6 py-2">
+                  {t("login")}
+                </Link>
+                <Link
+                  href={"/auth/register"}
+                  className="bg-blueColor px-6 py-2 text-white"
+                >
+                  {t("sign_up")}
+                </Link>
+              </div>
+            ) : (
+              <div className="flex w-[20%] items-center gap-4">
+                <Link href={"/properties/add"}>
+                  <PlusCircle className="size-7 cursor-pointer" />
+                </Link>
+                <Link
+                  href={
+                    user?.role == "admin"
+                      ? "/admin/analytics"
+                      : "/account/inbox"
+                  }
+                  className="relative h-10 w-10 overflow-hidden rounded-full"
+                >
+                  <Image
+                    src={user?.profile_image}
+                    alt="Profile picture"
+                    className="rounded-full object-cover"
+                    width={60}
+                    height={60}
+                    unoptimized
+                  />
+                </Link>
+              </div>
+            )}
+          </>
         </div>
       </div>
     </header>

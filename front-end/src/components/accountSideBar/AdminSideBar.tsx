@@ -1,34 +1,36 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
-import { MdDashboard } from "react-icons/md";
+import { useState, useEffect, useRef, useMemo } from "react";
 import {
-  FaBell,
-  FaGear,
-  FaInbox,
-  FaFile,
-  FaHeart,
-  FaUsers,
-  FaChartBar,
-  FaTags,
-  FaEnvelope,
-  FaChevronLeft,
-  FaChevronRight,
-} from "react-icons/fa6";
-import { FaEdit, FaListAlt } from "react-icons/fa";
+  Settings,
+  FileText,
+  Users,
+  BarChart,
+  Tags,
+  ChevronLeft,
+  ChevronRight,
+  List,
+} from "lucide-react";
+import { LucideIcon } from "lucide-react";
 import toast from "react-hot-toast";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import customAxios from "@/utils/customAxios";
 import useBoundStore from "@/store/store";
 
+interface MenuItem {
+  name: string;
+  link: string;
+  icon: LucideIcon;
+}
+
 const AdminSideBar = () => {
   const router = useRouter();
   const pathname = usePathname();
-  const [isOpen, setIsOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [isMobile, setIsMobile] = useState<boolean>(false);
 
-  const sidebarRef = useRef(null);
-  const buttonRef = useRef(null);
+  const sidebarRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     const checkIsMobile = () => {
@@ -40,12 +42,12 @@ const AdminSideBar = () => {
   }, []);
 
   useEffect(() => {
-    const handleClickOutside = (event) => {
+    const handleClickOutside = (event: MouseEvent) => {
       if (
         sidebarRef.current &&
-        !sidebarRef.current.contains(event.target) &&
+        !sidebarRef.current.contains(event.target as Node) &&
         buttonRef.current &&
-        !buttonRef.current.contains(event.target)
+        !buttonRef.current.contains(event.target as Node)
       ) {
         setIsOpen(false);
       }
@@ -60,51 +62,34 @@ const AdminSideBar = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isOpen]);
 
-  const menuItems = [
-    { name: "Analytics", link: "/admin/analytics", icon: FaChartBar },
-    { name: "Users", link: "/admin/users", icon: FaUsers },
+  const menuItems: MenuItem[] = useMemo(() => {
+    return [
+      { name: "Analytics", link: "/admin/analytics", icon: BarChart },
+      { name: "Users", link: "/admin/users", icon: Users },
+      {
+        name: "Posts",
+        link: "/admin/posts",
+        icon: FileText,
+      },
+      {
+        name: "Categories",
+        link: "/admin/categories",
+        icon: List,
+      },
+      {
+        name: "Features",
+        link: "/admin/features",
+        icon: Tags,
+      },
+      {
+        name: "Settings",
+        link: "/account/settings",
+        icon: Settings,
+      },
+    ];
+  }, []);
 
-    {
-      name: "Posts",
-      link: "/admin/posts",
-      icon: FaFile,
-    },
-    {
-      name: "Categories",
-      link: "/admin/categories",
-      icon: FaListAlt,
-    },
-    {
-      name: "Features",
-      link: "/admin/features",
-      icon: FaTags,
-    },
-    // {
-    //   name: "Notifications",
-    //   link: "/account/notifications",
-    //   icon: FaBell,
-    // },
-    // {
-    //   name: "Inbox",
-    //   link: "/account/inbox",
-    //   icon: FaInbox,
-    // },
-    // { name: "Wishlist", link: "/account/wishlist", icon: FaHeart },
-    // { name: "Posts", link: "/account/posts", icon: FaFile },
-
-    // {
-    //   name: "Edit Properties",
-    //   link: "/admin/edit-properties",
-    //   icon: FaEdit,
-    // },
-    {
-      name: "Settings",
-      link: "/account/settings",
-      icon: FaGear,
-    },
-  ];
-
-  const [activeIndex, setActiveIndex] = useState(0);
+  const [activeIndex, setActiveIndex] = useState<number>(0);
 
   const toggleSidebar = () => setIsOpen(!isOpen);
   const { setUser } = useBoundStore((state) => state);
@@ -123,8 +108,8 @@ const AdminSideBar = () => {
 
   useEffect(() => {
     const index = menuItems.findIndex((item) => item.link === pathname);
-    setActiveIndex(index);
-  }, [pathname]);
+    setActiveIndex(index !== -1 ? index : 0);
+  }, [pathname, menuItems]);
 
   return (
     <>
@@ -163,7 +148,7 @@ const AdminSideBar = () => {
                       }
                     }}
                   >
-                    <item.icon size={24} /> {/* Render the icon */}
+                    <item.icon size={24} />
                     <span>{item.name}</span>
                   </Link>
                 </li>
@@ -195,12 +180,12 @@ const AdminSideBar = () => {
           className="fixed left-full top-1/2 z-50 rounded-full bg-transparent p-2 backdrop-blur-lg focus:outline-none lg:hidden"
         >
           {isOpen ? (
-            <FaChevronLeft
+            <ChevronLeft
               onClick={toggleSidebar}
               className="h-4 w-4 scale-150 transform"
             />
           ) : (
-            <FaChevronRight
+            <ChevronRight
               onClick={toggleSidebar}
               className="h-4 w-4 scale-150 transform"
             />

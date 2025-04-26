@@ -10,7 +10,7 @@ const customAxios: AxiosInstance = axios.create({
   baseURL:
     (process.env.NODE_ENV === "production"
       ? "https://gl1.production-server.tech"
-      : "http://localhost:3005") + "/api",
+      : "http://localhost:5000") + "/api",
   withCredentials: true,
 });
 

@@ -7,6 +7,7 @@ import useBoundStore from "@/store/store";
 import customAxios from "@/utils/customAxios";
 import toast from "react-hot-toast";
 import { io } from "socket.io-client";
+import Image from "next/image";
 
 const InboxPage = () => {
   const [rooms, setRooms] = useState<any[]>([]);
@@ -137,11 +138,12 @@ const InboxPage = () => {
                   }`}
                   onClick={() => fetchMessages(room.room_id)}
                 >
-                  <img
+                  <Image
                     src={room.picture}
                     alt="Room"
                     className="mb-2 h-32 w-full rounded-lg object-cover"
                   />
+
                   {room.participants
                     .map((participant) => participant.username)
                     .join(", ")}

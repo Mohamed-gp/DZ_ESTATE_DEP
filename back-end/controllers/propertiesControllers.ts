@@ -2,17 +2,10 @@ import multer from "multer";
 import cloudinary from "../config/cloudinary";
 import { NextFunction, Request, Response } from "express";
 import pool from "../config/connectDb";
-// am gonna add chargily later since it don't work with typescript
-// import Chargily from "@chargily/chargily-pay";
 import Stripe from "stripe";
 import { authRequest } from "../interfaces/authInterface";
 import removefiles from "../utils/cleanUpload";
-import { validateCreateProperty } from "../utils/joiValidation";
 
-// const client = new Chargily.ChargilyClient({
-//   api_key: process.env.CHARGILY_SECRET_KEY,
-//   mode: "test",
-// });
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
   apiVersion: "2024-12-18.acacia",
@@ -24,14 +17,6 @@ const addPropertyController = async (
   next: NextFunction
 ) => {
   try {
-    const { error } = validateCreateProperty(req.body);
-    if (error) {
-      return res.status(400).json({
-        message: error.details[0].message,
-        data: null,
-      });
-    }
-
     const {
       title,
       description,
@@ -318,66 +303,6 @@ const reserveProperty = async (req: Request, res: Response) => {
   });
 };
 
-// const addReservationWithChargily = async (req: authRequest, res: Response) => {
-//   try {
-//     const userId = req.user.id;
-//     const homeId = req.params.id;
-
-//     let { checkIn, checkOut } = req.body;
-//     checkIn = new Date(checkIn);
-//     checkOut = new Date(checkOut);
-
-//     if (checkIn > checkOut) {
-//       return res.status(400).json({
-//         data: null,
-//         message: "Check out date must be greater than check in date",
-//       });
-//     }
-//     if (checkIn < new Date()) {
-//       return res.status(400).json({
-//         message: "Check in date must be greater than today",
-//         data: null,
-//       });
-//     }
-
-//     const home = await pool.query("SELECT * FROM homes WHERE id = $1", [homeId]);
-//     if (!home.rows[0]) {
-//       return res.status(404).json({ message: "Home not found", data: null });
-//     }
-
-//     const hasReserved = await pool.query(
-//       "SELECT * FROM reservations WHERE home_id = $1 AND status = 'paid' AND start_date <= $2 AND end_date >= $3",
-//       [homeId, checkOut, checkIn]
-//     );
-//     if (hasReserved.rows.length > 0) {
-//       return res.status(400).json({
-//         message: "This home is already reserved in this date",
-//         data: null,
-//       });
-//     }
-
-//     const reservation = await pool.query(
-//       "INSERT INTO reservations (start_date, end_date, user_id, home_id) VALUES ($1, $2, $3, $4) RETURNING *",
-//       [checkIn, checkOut, userId, homeId]
-//     );
-
-//     const days = Math.ceil((checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24));
-//     const newCheckout = await client.createCheckout({
-//       amount: home.rows[0].price * days,
-//       currency: "dzd",
-//       success_url: "https://krelli.production-server.tech/chargily/success",
-//       failure_url: "https://krelli.production-server.tech/chargily/failure",
-//       metadata: [{ reservationId: reservation.rows[0].id }],
-//     });
-
-//     res.status(200).json({
-//       message: "You just need to pay to complete your reservation",
-//       url: newCheckout.checkout_url,
-//     });
-//   } catch (error) {
-//     res.status(500).json({ data: null, message: "Internal Server Error" });
-//   }
-// };
 
 const addReservationWithStripe = async (req: authRequest, res: Response) => {
   try {

@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
+import ClientToaster from "@/components/clientToaster/ClientToaster";
 import Header from "@/components/header/Header";
 import Footer from "@/components/footer/Footer";
-import { Toaster } from "react-hot-toast";
 import { StoreProvider } from "@/providers/storeProvider";
 import SocketConnectClient from "@/components/socketConnectClient/SocketConnectClient";
-import { Suspense } from "react";
 import TranslationsProvider from "@/components/TranslationsProvider/TranslationsProvider";
 import initTranslations from "../i18n";
 
@@ -33,11 +32,11 @@ export default async function RootLayout({
   children: React.ReactNode;
   params: { lng: string };
 }>) {
-  const { lng } = params;
+  const { lng } = await params;
   const i18Namespace = ["translation"];
   const { resources } = await initTranslations(lng, i18Namespace);
   return (
-    <html lang={lng} className={lng === "ar" ? "rtl" : ""}>
+    <html>
       <body
         suppressHydrationWarning
         className={`${geistSans.variable} ${geistMono.variable} bg-[#F2F4F8] antialiased`}
@@ -49,21 +48,13 @@ export default async function RootLayout({
         >
           <StoreProvider>
             <SocketConnectClient />
-            <Toaster />
 
-            <Suspense
-              fallback={
-                <div className="flex h-16 items-center justify-center bg-white shadow-md">
-                  <div className="loader h-8 w-8 rounded-full border-4 border-t-4 border-gray-200 ease-linear"></div>
-                </div>
-              }
-            >
-              <Header />
-            </Suspense>
+            <Header />
 
             {children}
             <Footer />
           </StoreProvider>
+          <ClientToaster />
         </TranslationsProvider>
       </body>
     </html>

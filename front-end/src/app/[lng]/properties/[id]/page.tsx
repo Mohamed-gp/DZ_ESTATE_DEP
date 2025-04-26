@@ -5,7 +5,8 @@ import { DateRange } from "react-date-range";
 import "react-date-range/dist/styles.css"; // main css file
 import "react-date-range/dist/theme/default.css"; // theme css file
 import { LuGrip } from "react-icons/lu";
-import { FaStar, FaTrash, FaX } from "react-icons/fa6";
+import { FaStar, FaTrash } from "react-icons/fa6";
+import Image from "next/image";
 import customAxios from "@/utils/customAxios";
 import "leaflet/dist/leaflet.css";
 import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.webpack.css";
@@ -265,6 +266,7 @@ const SingleProperty = () => {
                         </p>
                         <div className="flex gap-4">
                           <div className="flex items-center gap-1">
+                            
                             <img
                               src="/phone.svg"
                               alt="phone.svg"

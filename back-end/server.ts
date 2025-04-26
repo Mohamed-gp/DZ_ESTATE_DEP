@@ -60,7 +60,6 @@ const PORT = process.env.PORT || 2000;
 const corsOptions = {
   // never do / in the last of the url
     origin: process.env.NODE_ENV === "production" ? process.env.FRONT_END_PROD_URL : process.env.FRONT_END_DEV_URL ,
-    
     credentials: true,
 }
 

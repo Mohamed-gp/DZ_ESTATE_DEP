@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from "express";
-import passport from "passport";
 import bcrypt from "bcrypt";
 import pool from "../config/connectDb";
 import jwt from "jsonwebtoken";

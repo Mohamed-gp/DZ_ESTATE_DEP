@@ -3,11 +3,13 @@ import Link from "next/link";
 import PropertyCard from "../propertyCard/PropertyCard";
 import { useEffect, useState } from "react";
 import customAxios from "@/utils/customAxios";
+import { useTranslation } from "react-i18next";
+import { ArrowRight } from "lucide-react";
 
-import { useTranslation } from 'react-i18next';
 const PropertiesForSale = () => {
   const { t } = useTranslation();
   const [properties, setProperties] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     getPropertiesForSale();
@@ -15,29 +17,65 @@ const PropertiesForSale = () => {
 
   const getPropertiesForSale = async () => {
     try {
+      setLoading(true);
       const { data } = await customAxios.get("/properties?status=sell");
       setProperties(data.data);
     } catch (error) {
       console.error(error);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <section className="my-12 py-12">
-      <div className="container flex flex-col gap-2">
-        <div className="flex items-center justify-between">
-          <p className="text-2xl font-bold">{t("Properties for Sell")}</p>
-          <Link href={"/properties"} className="text-blueColor">
+    <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="mb-12">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 className="text-3xl font-bold tracking-tight text-gray-900">
+              {t("Properties for Sell")}
+            </h2>
+            <p className="mt-2 text-lg text-gray-600">
+              Find your dream home to own and build your future
+            </p>
+          </div>
+          <Link
+            href="/properties?status=sell"
+            className="group mt-4 inline-flex items-center rounded-full bg-blue-50 px-6 py-2 text-blue-700 transition-all duration-200 hover:bg-blue-100 sm:mt-0"
+          >
             {t("See more")}
+            <ArrowRight className="ml-2 h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
           </Link>
         </div>
-        <div className="flex flex-wrap justify-center gap-12">
+      </div>
+
+      {loading ? (
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {[1, 2, 3, 4].map((i) => (
+            <div
+              key={i}
+              className="h-80 animate-pulse rounded-xl bg-gray-200"
+            ></div>
+          ))}
+        </div>
+      ) : properties.length === 0 ? (
+        <div className="rounded-lg bg-blue-50 p-8 text-center">
+          <h3 className="text-xl font-semibold text-gray-900">
+            No properties for sale available
+          </h3>
+          <p className="mt-2 text-gray-600">
+            Check back later for new listings
+          </p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {properties.map((property, index) => (
             <PropertyCard key={index} property={property} />
           ))}
         </div>
-      </div>
-    </section>
+      )}
+    </div>
   );
 };
+
 export default PropertiesForSale;

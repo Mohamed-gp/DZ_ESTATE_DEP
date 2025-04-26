@@ -1,24 +1,34 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
-import { MdDashboard } from "react-icons/md";
-import { FaBell, FaGear, FaInbox, FaFile, FaHeart } from "react-icons/fa6";
+import {
+  Settings,
+  Inbox,
+  FileText,
+  Heart,
+  ArrowUpCircle,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import toast from "react-hot-toast";
-import { FaChevronLeft, FaChevronRight } from "react-icons/fa6";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import customAxios from "@/utils/customAxios";
 import useBoundStore from "@/store/store";
-import { GiUpgrade } from "react-icons/gi";
+
+interface MenuItem {
+  name: string;
+  link: string;
+  icon: React.ElementType;
+}
 
 const SideBar = () => {
   const pathname = usePathname();
-
   const router = useRouter();
-  const [isOpen, setIsOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [isMobile, setIsMobile] = useState<boolean>(false);
 
-  const sidebarRef = useRef(null);
-  const buttonRef = useRef(null);
+  const sidebarRef = useRef<HTMLElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     const checkIsMobile = () => {
@@ -30,12 +40,12 @@ const SideBar = () => {
   }, []);
 
   useEffect(() => {
-    const handleClickOutside = (event) => {
+    const handleClickOutside = (event: MouseEvent) => {
       if (
         sidebarRef.current &&
-        !sidebarRef.current.contains(event.target) &&
+        !sidebarRef.current.contains(event.target as Node) &&
         buttonRef.current &&
-        !buttonRef.current.contains(event.target)
+        !buttonRef.current.contains(event.target as Node)
       ) {
         setIsOpen(false);
       }
@@ -50,37 +60,30 @@ const SideBar = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isOpen]);
 
-  const menuItems = [
-    // {
-    //   name: "Dashboard",
-    //   link: "/account/dashboard",
-    //   icon: MdDashboard,
-    // },
-    // {
-    //   name: "Notifications",
-    //   link: "/account/notifications",
-    //   icon: FaBell,
-    // },
-    {
-      name: "Inbox",
-      link: "/account/inbox",
-      icon: FaInbox,
-    },
-    { name: "Posts", link: "/account/posts", icon: FaFile },
-    { name: "Wishlist", link: "/account/wishlist", icon: FaHeart },
-    {
-      name: "Upgrade Profile",
-      link: "/account/upgradeProfile",
-      icon: GiUpgrade,
-    },
-    {
-      name: "Settings",
-      link: "/account/settings",
-      icon: FaGear,
-    },
-  ];
+  const menuItems: MenuItem[] = useMemo(
+    () => [
+      {
+        name: "Inbox",
+        link: "/account/inbox",
+        icon: Inbox,
+      },
+      { name: "Posts", link: "/account/posts", icon: FileText },
+      { name: "Wishlist", link: "/account/wishlist", icon: Heart },
+      {
+        name: "Upgrade Profile",
+        link: "/account/upgradeProfile",
+        icon: ArrowUpCircle,
+      },
+      {
+        name: "Settings",
+        link: "/account/settings",
+        icon: Settings,
+      },
+    ],
+    [],
+  );
 
-  const [activeIndex, setActiveIndex] = useState(0);
+  const [activeIndex, setActiveIndex] = useState<number>(0);
 
   const toggleSidebar = () => setIsOpen(!isOpen);
   const { setUser } = useBoundStore((state) => state);
@@ -99,8 +102,11 @@ const SideBar = () => {
 
   useEffect(() => {
     const index = menuItems.findIndex((item) => item.link === pathname);
-    setActiveIndex(index);
-  }, [pathname]);
+    if (index !== -1) {
+      setActiveIndex(index);
+    }
+  }, [pathname, menuItems]);
+
   return (
     <>
       <aside
@@ -138,7 +144,7 @@ const SideBar = () => {
                       }
                     }}
                   >
-                    <item.icon size={24} /> {/* Render the icon */}
+                    <item.icon size={24} />
                     <span>{item.name}</span>
                   </Link>
                 </li>
@@ -171,9 +177,9 @@ const SideBar = () => {
           onClick={toggleSidebar}
         >
           {isOpen ? (
-            <FaChevronLeft className="h-4 w-4 scale-150 transform" /> // Icône de fermeture avec React Icons
+            <ChevronLeft className="h-4 w-4 scale-150 transform" />
           ) : (
-            <FaChevronRight className="h-4 w-4 scale-150 transform" /> // Icône de menu avec React Icons
+            <ChevronRight className="h-4 w-4 scale-150 transform" />
           )}
           <span className="sr-only">Toggle Sidebar</span>
         </button>

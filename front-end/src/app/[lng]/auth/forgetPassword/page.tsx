@@ -7,7 +7,6 @@ import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import customAxios from "@/utils/customAxios";
 import useBoundStore from "@/store/store";
-import axios from "axios";
 
 const Page = () => {
   const { user, setUser } = useBoundStore((state) => state);

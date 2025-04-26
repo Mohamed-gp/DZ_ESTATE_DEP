@@ -1,5 +1,5 @@
 "use client";
-import { FaGoogle } from "react-icons/fa";
+import { Globe } from "lucide-react";
 import { app } from "@/utils/fireBase";
 import useBoundStore from "../../store/store";
 import { GoogleAuthProvider, getAuth, signInWithPopup } from "firebase/auth";
@@ -35,7 +35,7 @@ const GoogleSignIn = () => {
       type="button"
       className="order-5 flex h-full w-[100%] flex-grow-0 flex-row items-center justify-center self-stretch rounded-lg border-2 border-[#0F62FE] px-4 py-2 text-base text-[#0F62FE]"
     >
-      <FaGoogle />
+      <Globe />
       log in with Google
     </button>
   );

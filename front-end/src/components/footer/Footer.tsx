@@ -1,34 +1,37 @@
 "use client";
 import Link from "next/link";
 import Image from "next/image";
-import { FaFacebookF, FaXTwitter, FaInstagram } from "react-icons/fa6";
-import { FaLinkedinIn } from "react-icons/fa";
-import initTranslations from "@/app/i18n";
 import { useTranslation } from "react-i18next";
+import {
+  FacebookIcon,
+  InstagramIcon,
+  LinkedinIcon,
+  Twitter,
+} from "lucide-react";
 
 const socialLinks = [
   {
     name: "LinkedIn",
     link: "https://www.linkedin.com/",
-    icon: FaLinkedinIn,
+    icon: LinkedinIcon,
     id: "linkedinId",
   },
   {
     name: "Twitter",
     link: "https://twitter.com/",
-    icon: FaXTwitter,
+    icon: Twitter,
     id: "twitterId",
   },
   {
     name: "Facebook",
     link: "https://www.facebook.com/",
-    icon: FaFacebookF,
+    icon: FacebookIcon,
     id: "facebookId",
   },
   {
     name: "Instagram",
     link: "https://www.instagram.com/",
-    icon: FaInstagram,
+    icon: InstagramIcon,
     id: "instagramId",
   },
 ];

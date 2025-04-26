@@ -1,8 +1,7 @@
 "use client";
-
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { IoIosArrowDown } from "react-icons/io";
+import { ChevronDown } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import i18nConfig from "../../../i18nConfig";
 
@@ -21,7 +20,7 @@ export default function LanguageOptions() {
 
     // set cookie for next-i18n-router
     const days = 30;
-    const date = new Date();
+    const date = new Date();  
     date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
     const expires = date.toUTCString();
     document.cookie = `NEXT_LOCALE=${newLocale};expires=${expires};path=/`;
@@ -55,7 +54,7 @@ export default function LanguageOptions() {
         className="flex cursor-pointer items-center gap-2"
       >
         {currentLocale}
-        <IoIosArrowDown />
+        <ChevronDown />
       </div>
       {isOpen && (
         <div className="absolute right-0 top-full z-10 mt-2 w-32 rounded-md bg-white shadow-lg">

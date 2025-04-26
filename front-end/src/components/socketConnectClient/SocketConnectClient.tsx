@@ -12,7 +12,7 @@ const SocketConnectClient = () => {
     if (user?.id) {
       const socket = io(
         process.env.NEXT_PUBLIC_NODE_ENV == "development"
-          ? "http://localhost:3005"
+          ? "http://localhost:5000"
           : "https://gl1.production-server.tech",
         {
           auth: { userId: user.id },
@@ -23,7 +23,7 @@ const SocketConnectClient = () => {
         socket.disconnect();
       };
     }
-  }, []);
+  }, [user?.id]);
   return null;
 };
 export default SocketConnectClient;

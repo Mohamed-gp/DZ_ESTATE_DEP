@@ -4,6 +4,7 @@ import React from "react";
 import toast from "react-hot-toast";
 import { FaCheck, FaStar } from "react-icons/fa";
 
+
 const page = () => {
   const upgradeProfile = async () => {
     try {
