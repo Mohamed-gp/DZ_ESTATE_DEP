@@ -12,8 +12,9 @@ import logo from "../../../public/logo.svg";
 import Link from "next/link";
 import LanguageOptions from "@/components/languageOptions/LanguageOptions";
 import useBoundStore from "@/store/store";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useTranslation } from "react-i18next";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 
 const socialLinks = [
   {
@@ -46,17 +47,114 @@ const Header = () => {
   const { t } = useTranslation();
   const { user } = useBoundStore((state) => state);
   const searchParams = useSearchParams();
+  const pathname = usePathname();
   const router = useRouter();
 
-  const searchHandler = (keyword: string) => {
-    const params = new URLSearchParams(searchParams.toString());
-    if (keyword) {
-      params.set("keyword", keyword);
-    } else {
-      params.delete("keyword");
+  // Local search input value - separate from URL param
+  const [searchInputValue, setSearchInputValue] = useState("");
+
+  // Actual search term from URL - this drives the real search
+  const [searchTerm, setSearchTerm] = useState(
+    searchParams.get("keyword") || "",
+  );
+
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const previousSearchRef = useRef<string>("");
+  const isPropertiesPage = useMemo(
+    () => pathname.includes("/properties"),
+    [pathname],
+  );
+
+  // This effect synchronizes the search parameter from URL with our input value
+  useEffect(() => {
+    const keyword = searchParams.get("keyword") || "";
+    setSearchInputValue(keyword);
+
+    // Only update when coming from external navigation
+    if (previousSearchRef.current !== keyword) {
+      setSearchTerm(keyword);
+      previousSearchRef.current = keyword;
     }
-    router.push(`/properties?${params.toString()}`);
-  };
+  }, [searchParams]);
+
+  // Optimized debounced search handler
+  const handleSearchChange = useCallback(
+    (value: string) => {
+      // Update the input immediately for responsive UI
+      setSearchInputValue(value);
+
+      // Clear any existing timeout
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+
+      // Set a new timeout to update the URL after user stops typing
+      searchTimeoutRef.current = setTimeout(() => {
+        // Avoid unnecessary navigation if value hasn't changed
+        if (value === previousSearchRef.current) return;
+
+        previousSearchRef.current = value;
+        setSearchTerm(value);
+
+        // Only navigate if we're not already on the properties page
+        // or if we are and the value changed
+        if (value) {
+          const params = new URLSearchParams(searchParams.toString());
+          params.set("keyword", value);
+
+          if (isPropertiesPage) {
+            // Use replace instead of push to avoid browser history buildup
+            router.replace(`/properties?${params.toString()}`, {
+              scroll: false,
+            });
+          } else {
+            router.push(`/properties?${params.toString()}`);
+          }
+        } else if (isPropertiesPage) {
+          // Only remove keyword parameter without full navigation
+          const params = new URLSearchParams(searchParams.toString());
+          params.delete("keyword");
+          router.replace(`/properties?${params.toString()}`, { scroll: false });
+        }
+      }, 500); // Increased to 500ms for better performance
+    },
+    [searchParams, router, isPropertiesPage],
+  );
+
+  // Optimized immediate search handler for Enter key
+  const handleSearchSubmit = useCallback(
+    (e: React.FormEvent) => {
+      e.preventDefault();
+
+      // Clear any pending debounced search
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+        searchTimeoutRef.current = null;
+      }
+
+      // Execute search immediately
+      const value = searchInputValue;
+      previousSearchRef.current = value;
+      setSearchTerm(value);
+
+      const params = new URLSearchParams();
+      if (value) {
+        params.set("keyword", value);
+      }
+
+      router.push(`/properties?${params.toString()}`);
+    },
+    [router, searchInputValue],
+  );
+
+  // Clean up timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+    };
+  }, []);
 
   if (user?.role == "admin") {
     return null;
@@ -98,24 +196,31 @@ const Header = () => {
         </div>
       </div>
 
-      {/* Rest of your header remains unchanged */}
       <div className="header-bottom bg-white py-6">
         <div className="container flex flex-wrap items-center justify-between gap-y-6">
           <Link href={"/"} className="logo mx-auto flex items-center">
             <p className="font-bold text-blackColor">Estatery</p>
-            <Image src={logo} alt="logo" />
+            <Image src={logo} alt="logo" priority />
           </Link>
           <div className="mx-auto flex items-center">
-            <div className="flex w-full items-center border bg-white py-2">
-              <input
-                type="text"
-                value={searchParams.get("keyword") || ""}
-                onChange={(e) => searchHandler(e.target.value)}
-                className="h-full w-[50%] flex-1 px-4 focus:outline-none"
-                placeholder={t("search_placeholder")}
-              />
-              <Search className="mr-6" />
-            </div>
+            <form onSubmit={handleSearchSubmit} className="w-full">
+              <div className="relative flex w-full items-center border bg-white py-2">
+                <input
+                  type="text"
+                  value={searchInputValue}
+                  onChange={(e) => handleSearchChange(e.target.value)}
+                  className="h-full w-full flex-1 px-4 pl-10 focus:outline-none"
+                  placeholder={t("search_placeholder")}
+                  aria-label="Search properties"
+                />
+                <div className="absolute left-3 flex items-center justify-center text-gray-400">
+                  <Search className="h-5 w-5" />
+                </div>
+                <button type="submit" className="sr-only">
+                  Search
+                </button>
+              </div>
+            </form>
           </div>
 
           <>
@@ -145,7 +250,7 @@ const Header = () => {
                   className="relative h-10 w-10 overflow-hidden rounded-full"
                 >
                   <Image
-                    src={user?.profile_image}
+                    src={user?.profile_image || "/default-profile.png"}
                     alt="Profile picture"
                     className="rounded-full object-cover"
                     width={60}

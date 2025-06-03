@@ -16,6 +16,7 @@ import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import customAxios from "@/utils/customAxios";
 import useBoundStore from "@/store/store";
+import { useTranslation } from "react-i18next";
 
 interface MenuItem {
   name: string;
@@ -24,6 +25,7 @@ interface MenuItem {
 }
 
 const AdminSideBar = () => {
+  const { t } = useTranslation();
   const router = useRouter();
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -64,30 +66,30 @@ const AdminSideBar = () => {
 
   const menuItems: MenuItem[] = useMemo(() => {
     return [
-      { name: "Analytics", link: "/admin/analytics", icon: BarChart },
-      { name: "Users", link: "/admin/users", icon: Users },
+      { name: t("admin.analytics"), link: "/admin/analytics", icon: BarChart },
+      { name: t("admin.users"), link: "/admin/users", icon: Users },
       {
-        name: "Posts",
+        name: t("admin.posts"),
         link: "/admin/posts",
         icon: FileText,
       },
       {
-        name: "Categories",
+        name: t("admin.categories"),
         link: "/admin/categories",
         icon: List,
       },
       {
-        name: "Features",
+        name: t("admin.features"),
         link: "/admin/features",
         icon: Tags,
       },
       {
-        name: "Settings",
+        name: t("sidebar.settings"),
         link: "/account/settings",
         icon: Settings,
       },
     ];
-  }, []);
+  }, [t]);
 
   const [activeIndex, setActiveIndex] = useState<number>(0);
 
@@ -102,7 +104,7 @@ const AdminSideBar = () => {
       router.push("/");
       toast.success(data.message);
     } catch (err) {
-      toast.error(err.response?.data?.message || "Logout failed");
+      toast.error(err.response?.data?.message || t("auth.logoutFailed"));
     }
   };
 
@@ -171,7 +173,7 @@ const AdminSideBar = () => {
               onClick={logoutHandler}
               className="w-3/4 rounded bg-blue-500 py-2 text-base text-white focus:outline-none"
             >
-              Log Out
+              {t("auth.logout")}
             </button>
           </footer>
         </div>
@@ -190,7 +192,7 @@ const AdminSideBar = () => {
               className="h-4 w-4 scale-150 transform"
             />
           )}
-          <span className="sr-only">Toggle Sidebar</span>
+          <span className="sr-only">{t("sidebar.toggleSidebar")}</span>
         </button>
       </aside>
     </>

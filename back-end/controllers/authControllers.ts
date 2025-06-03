@@ -18,32 +18,29 @@ const handleRefreshToken = async (
   res: Response,
   next: NextFunction
 ) => {
-  const refreshToken = req.cookies.refreshToken;
-  if (!refreshToken) {
-    return res.status(401).json({ error: "No token provided" });
-  }
-  const { REFRESH_TOKEN_SECRET, ACCESS_TOKEN_SECRET } = process.env;
-
-  if (!REFRESH_TOKEN_SECRET || !ACCESS_TOKEN_SECRET) {
-    console.error("Missing token secrets in environment variables");
-    res.status(500).json({ error: "Internal Server error" });
-  }
   try {
+    const refreshToken = req.cookies.refreshToken;
+    if (!refreshToken) {
+      return res.status(401).json({ error: "No token provided" });
+    }
+    const { REFRESH_TOKEN_SECRET, ACCESS_TOKEN_SECRET } = process.env;
+    if (!REFRESH_TOKEN_SECRET || !ACCESS_TOKEN_SECRET) {
+      return res.status(500).json({ error: "Internal Server error" });
+    }
     const user = await pool.query(
       "SELECT * FROM users WHERE refresh_token = $1",
       [encrypt(refreshToken)]
     );
-    if (user.rowCount === 0) {
+    if (!user || user.rowCount === 0) {
       return res
         .status(200)
         .clearCookie("refreshToken")
         .clearCookie("accessToken")
         .json({ message: "Invalid token login again", data: null });
     }
-    // here am decrypting the token and verifying it i encrypt it to store it in the database
     jwt.verify(
       decrypt(refreshToken),
-      REFRESH_TOKEN_SECRET,
+      REFRESH_TOKEN_SECRET as string,
       (err, decoded: any) => {
         if (err || user.rows[0]?.id !== decoded?.id) {
           return res
@@ -52,9 +49,13 @@ const handleRefreshToken = async (
             .clearCookie("accessToken")
             .json({ message: "Invalid token login again", data: null });
         }
-        const accessToken = jwt.sign({ id: decoded.id }, ACCESS_TOKEN_SECRET, {
-          expiresIn: "24h",
-        });
+        const accessToken = jwt.sign(
+          { id: decoded.id },
+          ACCESS_TOKEN_SECRET as string,
+          {
+            expiresIn: "24h",
+          }
+        );
         return res
           .status(200)
           .cookie("accessToken", accessToken, {
@@ -70,8 +71,10 @@ const handleRefreshToken = async (
           .json({ message: "access token Created successfully", data: null });
       }
     );
+    return;
   } catch (error) {
     next(error);
+    return;
   }
 };
 
@@ -98,7 +101,11 @@ const registerController = async (
       [email]
     );
 
-    if (checkUserExistence.rowCount > 0) {
+    if (
+      checkUserExistence &&
+      checkUserExistence.rowCount &&
+      checkUserExistence.rowCount > 0
+    ) {
       return res.status(400).json({ message: "User already exists" });
     }
     const salt = await bcrypt.genSalt(10);
@@ -110,12 +117,12 @@ const registerController = async (
     );
     const accessToken = jwt.sign(
       { id: newUser.rows[0].id },
-      process.env.ACCESS_TOKEN_SECRET,
+      process.env.ACCESS_TOKEN_SECRET as string,
       { expiresIn: "24h" }
     );
     const refreshToken = jwt.sign(
       { id: newUser.rows[0].id },
-      process.env.REFRESH_TOKEN_SECRET,
+      process.env.REFRESH_TOKEN_SECRET as string,
       { expiresIn: "7d" }
     );
     const encryptedRefreshToken = encrypt(refreshToken);
@@ -148,9 +155,8 @@ const registerController = async (
       })
       .json({ message: "Login successful", data: { user: newUser.rows[0] } });
   } catch (err) {
-    console.log("error in the register controller");
-    console.log(err.message);
     next(err);
+    return;
   }
 };
 
@@ -172,17 +178,26 @@ const googleSignInController = async (
       email,
     ]);
 
-    if (userResult.rowCount > 0) {
+    if (userResult && userResult.rowCount && userResult.rowCount > 0) {
       const user = userResult.rows[0];
+
+      // Update profile image if it's different from Google
+      if (photoUrl && user.profile_image !== photoUrl) {
+        await pool.query("UPDATE users SET profile_image = $1 WHERE id = $2", [
+          photoUrl,
+          user.id,
+        ]);
+        user.profile_image = photoUrl;
+      }
 
       const accessToken = jwt.sign(
         { id: user.id },
-        process.env.ACCESS_TOKEN_SECRET,
+        process.env.ACCESS_TOKEN_SECRET as string,
         { expiresIn: "24h" }
       );
       const refreshToken = jwt.sign(
         { id: user.id },
-        process.env.REFRESH_TOKEN_SECRET,
+        process.env.REFRESH_TOKEN_SECRET as string,
         { expiresIn: "7d" }
       );
 
@@ -217,7 +232,7 @@ const googleSignInController = async (
               : "localhost",
         })
         .status(200)
-        .json({ message: "login successfully", data: user });
+        .json({ message: "login successfully", data: { user: user } });
     } else {
       const generatedPassword =
         Math.random().toString(36).slice(-8) +
@@ -276,8 +291,10 @@ const googleSignInController = async (
         .status(201)
         .json({ message: "user created successfully", data: newUser });
     }
+    return;
   } catch (error) {
     next(error);
+    return;
   }
 };
 
@@ -302,7 +319,7 @@ const loginController = async (
       email,
     ]);
 
-    if (user.rows.length === 0) {
+    if (!user || user.rows.length === 0) {
       return res.status(404).json({ message: "User does not exist" });
     }
     const validPassword = await bcrypt.compare(password, user.rows[0].password);
@@ -312,16 +329,15 @@ const loginController = async (
 
     const accessToken = jwt.sign(
       { id: user.rows[0].id },
-      process.env.ACCESS_TOKEN_SECRET,
+      process.env.ACCESS_TOKEN_SECRET as string,
       { expiresIn: "24h" }
     );
     const refreshToken = jwt.sign(
       { id: user.rows[0].id },
-      process.env.REFRESH_TOKEN_SECRET,
+      process.env.REFRESH_TOKEN_SECRET as string,
       { expiresIn: "7d" }
     );
     const encryptedRefreshToken = encrypt(refreshToken);
-    // we store the refresh token in the database so we will be able to revoke it later (logout) by making it invalid
     await pool.query("UPDATE users SET refresh_token = $1 WHERE id = $2", [
       encryptedRefreshToken,
       user.rows[0].id,
@@ -352,40 +368,8 @@ const loginController = async (
       .json({ message: "Login successful", data: { user: user.rows[0] } });
   } catch (error) {
     next(error);
+    return;
   }
-};
-
-// /**
-//  *
-//  * @method GET
-//  * @access Public
-//  * @description Google sign-in controller
-//  * @route /api/auth/google
-//  */
-// const googleSignInController = (req: Request, res: Response, next: NextFunction) => {
-//   passport.authenticate('google', { scope: ['profile', 'email'] })(req, res, next);
-// };
-
-// /**
-//  *
-//  * @method GET
-//  * @access Public
-//  * @description Google sign-in callback controller
-//  * @route /api/auth/google/callback
-//  */
-// const googleSignInCallbackController = (req: Request, res: Response, next: NextFunction) => {
-
-// };
-
-/**
- *
- * @method POST
- * @access Public
- * @description Forget password controller
- * @route /api/auth/forget-password
- */
-const forgetPasswordController = async (req: Request, res: Response) => {
-  // Implement forget password logic here
 };
 
 /**
@@ -401,11 +385,6 @@ const logoutController = async (
   next: NextFunction
 ) => {
   try {
-    // const userId = req.user?.id;
-    // if(!userId) {
-    //   return res.status(401).json({message: "Unauthorized"});
-    // }
-    // await pool.query("UPDATE users SET refresh_token = null WHERE id = $1", [userId]);
     return res
       .status(200)
       .clearCookie("refreshToken", {
@@ -430,44 +409,7 @@ const logoutController = async (
       .json({ message: "Logout successful", data: null });
   } catch (error) {
     next(error);
-  }
-};
-
-/**
- *
- * @method POST
- * @access Public
- * @description SMS verification controller
- * @route /api/auth/sms-verification
- */
-const smsVerificationController = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  const { phoneNumber } = req.body;
-  try {
-  } catch (err) {
-    next(err);
-  }
-};
-
-/**
- *
- * @method POST
- * @access Public
- * @description Verify SMS code controller
- * @route /api/auth/verify-sms-code
- */
-const verifySmsCodeController = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  const { phoneNumber, code } = req.body;
-  try {
-  } catch (err) {
-    next(err);
+    return;
   }
 };
 
@@ -479,6 +421,9 @@ const verifySmsCodeController = async (
  * @route /api/auth/changepassword
  */
 const changePassword = async (req: authRequest, res: Response) => {
+  if (!req.user || !req.user.id) {
+    return res.status(401).json({ message: "Unauthorized", data: null });
+  }
   const { currentPassword, newPassword, confirmNewPassword } = req.body;
   if (!currentPassword || !newPassword || !confirmNewPassword) {
     return res
@@ -495,7 +440,6 @@ const changePassword = async (req: authRequest, res: Response) => {
   const user = await pool.query("SELECT * FROM users WHERE id = $1", [
     req.user.id,
   ]);
-  console.log(currentPassword, user?.rows[0]?.password);
   const validPassword = await bcrypt.compare(
     currentPassword,
     user?.rows[0]?.password
@@ -508,12 +452,6 @@ const changePassword = async (req: authRequest, res: Response) => {
       .status(400)
       .json({ data: null, message: "password must be at least 6 characters" });
   }
-  // const { error } = verifyUpdatePassword({ password: newPassword });
-  // if (error) {
-  //   return res
-  //     .status(400)
-  //     .json({ data: null, message: error.details[0].message });
-  // }
 
   const updatedUser = await pool.query(
     "UPDATE users SET password = $1 WHERE id = $2 RETURNING *",
@@ -521,7 +459,7 @@ const changePassword = async (req: authRequest, res: Response) => {
   );
 
   updatedUser.rows[0].password = "";
-  res
+  return res
     .status(200)
     .json({ message: "updated successfully", data: updatedUser.rows[0] });
 };
@@ -531,10 +469,6 @@ export {
   loginController,
   registerController,
   googleSignInController,
-  // googleSignInCallbackController,
-  forgetPasswordController,
   logoutController,
-  smsVerificationController,
   changePassword,
-  verifySmsCodeController,
 };

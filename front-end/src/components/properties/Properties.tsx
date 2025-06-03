@@ -10,18 +10,17 @@ const Properties = () => {
   const searchParams = useSearchParams();
   const [properties, setProperties] = useState([]);
 
-  const getProperties = async () => {
-    try {
-      const { data } = await customAxios.get("/properties", {
-        params: Object.fromEntries(searchParams.entries()),
-      });
-      setProperties(data.data);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
   useEffect(() => {
+    const getProperties = async () => {
+      try {
+        const { data } = await customAxios.get("/properties", {
+          params: Object.fromEntries(searchParams.entries()),
+        });
+        setProperties(data.data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
     getProperties();
   }, [searchParams]);
 

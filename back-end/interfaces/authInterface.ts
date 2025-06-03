@@ -1,16 +1,16 @@
-import { Request,Response } from "express";
+import { Request, Response } from "express";
 interface authRequest extends Request {
-    user? : {
-        id? : string;
-    }
+  user?: {
+    id?: string;
+    role?: string;
+  };
 }
-
 
 interface ioResponse extends Response {
-    io?: any;
+  io?: any;
 }
 
-export {authRequest,ioResponse}
+export { authRequest, ioResponse };
 
 // interface loginInterface {
 //   email: string;

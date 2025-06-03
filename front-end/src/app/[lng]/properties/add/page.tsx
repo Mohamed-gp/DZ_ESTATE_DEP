@@ -91,7 +91,6 @@ const PropertyForm = () => {
       toast.success(data.message);
     } catch (error) {
       toast.error(error.response.data.message);
-      console.log(error);
     }
   };
   const [categories, setCategories] = useState([]);
@@ -99,7 +98,6 @@ const PropertyForm = () => {
     try {
       const { data } = await customAxios.get(`/categories`);
       setCategories(data.data);
-      console.log(data.data);
     } catch (error) {
       console.log(error);
     }
@@ -109,7 +107,6 @@ const PropertyForm = () => {
     try {
       const { data } = await customAxios.get(`/features`);
       setFeatures(data.data);
-      console.log(data.data);
     } catch (error) {
       console.log(error);
     }

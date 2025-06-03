@@ -7,10 +7,13 @@ import pool from "../config/connectDb";
  */
 const getFeatures = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const features = await pool.query('SELECT * FROM features');
-    return res.status(200).json({ message: "Features fetched successfully", data: features.rows });
+    const features = await pool.query("SELECT * FROM features");
+    return res
+      .status(200)
+      .json({ message: "Features fetched successfully", data: features.rows });
   } catch (error) {
     next(error);
+    return;
   }
 };
 
@@ -22,12 +25,18 @@ const addFeature = async (req: Request, res: Response, next: NextFunction) => {
   const { title, description } = req.body;
   try {
     const newFeature = await pool.query(
-      'INSERT INTO features (title, description) VALUES ($1, $2) RETURNING *',
+      "INSERT INTO features (title, description) VALUES ($1, $2) RETURNING *",
       [title, description]
     );
-    return res.status(201).json({ message: "Feature added successfully", data: newFeature.rows[0] });
+    return res
+      .status(201)
+      .json({
+        message: "Feature added successfully",
+        data: newFeature.rows[0],
+      });
   } catch (error) {
     next(error);
+    return;
   }
 };
 
@@ -35,18 +44,19 @@ const addFeature = async (req: Request, res: Response, next: NextFunction) => {
  * @description Remove a feature
  * @route DELETE /api/features/:id
  */
-const removeFeature = async (req: Request, res: Response, next: NextFunction) => {
+const removeFeature = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const { id } = req.params;
   try {
-    await pool.query('DELETE FROM features WHERE id = $1', [id]);
+    await pool.query("DELETE FROM features WHERE id = $1", [id]);
     return res.status(200).json({ message: "Feature removed successfully" });
   } catch (error) {
     next(error);
+    return;
   }
 };
 
-export {
-  getFeatures,
-  addFeature,
-  removeFeature,
-};
+export { getFeatures, addFeature, removeFeature };

@@ -26,7 +26,6 @@ const AdminUsersPage = () => {
     try {
       const { data } = await customAxios.get("/admin/users");
       setUsers(data.data);
-      console.log(data.data)
       setLoading(false);
     } catch (error) {
       console.error("Failed to fetch users", error);

@@ -1,17 +1,17 @@
-import { NextFunction, Request, Response } from "express";
-import pool from "../config/connectDb";
-import Stripe from "stripe";
+import { Response, NextFunction } from "express";
 import { authRequest } from "../interfaces/authInterface";
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: "2024-12-18.acacia",
-});
+import pool from "../config/connectDb";
+import stripe from "../utils/stripe";
 
 const reserveOrBuyProperty = async (
   req: authRequest,
   res: Response,
   next: NextFunction
-) => {
+): Promise<Response | void> => {
+  if (!req.user?.id) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+
   const { property_id, start_date, end_date } = req.body;
   const user_id = req.user.id;
 
@@ -64,8 +64,8 @@ const reserveOrBuyProperty = async (
         metadata: {
           property_id: property.id,
           user_id: user_id,
-          start_date: start_date,
-          end_date: end_date,
+          start_date,
+          end_date,
         },
       });
 
@@ -106,10 +106,10 @@ const reserveOrBuyProperty = async (
       return res.status(400).json({ message: "Invalid property status" });
     }
   } catch (error) {
-    console.error("Error processing request:", error);
-    return res
-      .status(500)
-      .json({ message: "An error occurred while processing the request" });
+    console.error("Error in reserveOrBuyProperty:", error);
+    return res.status(500).json({
+      message: "An error occurred while processing the request",
+    });
   }
 };
 

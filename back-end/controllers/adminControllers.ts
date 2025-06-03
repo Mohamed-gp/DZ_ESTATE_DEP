@@ -12,7 +12,7 @@ const getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
       .status(200)
       .json({ message: "Users fetched successfully", data: users.rows });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -71,7 +71,7 @@ const getAllProperties = async (
       message: "Properties fetched successfully",
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -85,7 +85,7 @@ const removeProperty = async (
     await pool.query("DELETE FROM properties WHERE id = $1", [id]);
     return res.status(200).json({ message: "Property removed successfully" });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -99,7 +99,7 @@ const removeUser = async (req: Request, res: Response, next: NextFunction) => {
     await pool.query("DELETE FROM users WHERE id = $1", [id]);
     return res.status(200).json({ message: "User removed successfully" });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 

@@ -37,7 +37,6 @@ customAxios.interceptors.response.use(
         return customAxios(originalRequest);
       } catch (refreshError) {
         // Redirect to login on refresh failure
-        console.log(refreshError);
         // window.location.href = '/login';
         return Promise.reject(refreshError);
       }

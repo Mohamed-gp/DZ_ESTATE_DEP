@@ -9,8 +9,10 @@ import customAxios from "@/utils/customAxios";
 import useBoundStore from "@/store/store";
 import toast from "react-hot-toast";
 import PropertyCard from "@/components/propertyCard/PropertyCard";
+import { useTranslation } from "react-i18next";
 
 export default function PropertiesPage() {
+  const { t } = useTranslation();
   const [properties, setProperties] = useState<any[]>([]);
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -50,12 +52,12 @@ export default function PropertiesPage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
-        <h1 className="mb-6 text-2xl font-bold">Your Properties</h1>
+        <h1 className="mb-6 text-2xl font-bold">{t("account.posts.title")}</h1>
         <div className="relative">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-gray-400" />
           <Input
             type="text"
-            placeholder="Search Your Property"
+            placeholder={t("account.posts.searchPlaceholder")}
             value={searchQuery}
             onChange={(e) => {
               setSearchQuery(e.target.value);
@@ -84,7 +86,7 @@ export default function PropertiesPage() {
                   <Plus className="h-6 w-6 text-gray-600" />
                 </div>
                 <h3 className="mt-4 text-sm font-medium text-gray-900">
-                  Add Your Property
+                  {t("account.posts.addProperty")}
                 </h3>
               </div>
             </Link>
@@ -109,7 +111,7 @@ export default function PropertiesPage() {
               <ChevronLeft className="h-4 w-4" />
             </Button>
             <span className="text-sm text-gray-600">
-              Page {page} of {totalPages}
+              {t("common.page")} {page} {t("common.of")} {totalPages}
             </span>
             <Button
               variant="outline"

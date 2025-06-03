@@ -2,13 +2,15 @@ import { Server } from "socket.io";
 import { Server as HttpServer } from "http";
 
 let onlineUsers: string[] = [];
-const socketInit = (server: HttpServer) => {
+
+const initializeSocket = (server: HttpServer) => {
   const io = new Server(server, {
     cors: {
       origin:
         process.env.NODE_ENV === "development"
-          ? "http://localhost:4002"
-          : "https://gl.production-server.tech",
+          ? ["http://localhost:3000", "http://localhost:3001"]
+          : "https://gl1.production-server.tech",
+      credentials: true,
     },
   });
 
@@ -32,4 +34,5 @@ const socketInit = (server: HttpServer) => {
   return io;
 };
 
-export { onlineUsers, socketInit };
+export default initializeSocket;
+export { onlineUsers };

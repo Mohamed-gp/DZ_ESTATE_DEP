@@ -1,15 +1,26 @@
 import { Request, Response } from "express";
 import Stripe from "stripe";
 import pool from "../config/connectDb";
+import stripe from "../utils/stripe";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: "2024-12-18.acacia",
-});
+interface CheckoutSessionMetadata {
+  property_id?: string;
+  user_id?: string;
+  start_date?: string;
+  end_date?: string;
+}
 
-const handleStripeWebhook = async (req: Request, res: Response) => {
+const handleStripeWebhook = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
   const sig = req.headers["stripe-signature"];
 
-  let event;
+  if (!process.env.STRIPE_WEBHOOK_SECRET || !sig) {
+    return res.status(400).send("Webhook secret or signature missing");
+  }
+
+  let event: Stripe.Event;
 
   try {
     event = stripe.webhooks.constructEvent(
@@ -18,26 +29,27 @@ const handleStripeWebhook = async (req: Request, res: Response) => {
       process.env.STRIPE_WEBHOOK_SECRET
     );
   } catch (err) {
-    console.error(`Webhook signature verification failed: ${err.message}`);
-    return res.status(400).send(`Webhook Error: ${err.message}`);
+    const error = err as Error;
+    return res.status(400).send(`Webhook Error: ${error.message}`);
   }
 
   // Handle the event
   switch (event.type) {
-    case "checkout.session.completed":
+    case "checkout.session.completed": {
       const session = event.data.object as Stripe.Checkout.Session;
+      const metadata = session.metadata as CheckoutSessionMetadata;
 
       if (session.mode === "payment" && session.payment_status === "paid") {
-        const { property_id, user_id, start_date, end_date } = session.metadata;
+        const { property_id, user_id, start_date, end_date } = metadata;
 
-        if (session.metadata.start_date && session.metadata.end_date) {
+        if (start_date && end_date) {
           // Create reservation
           await pool.query(
             `INSERT INTO reservations (user_id, property_id, start_date, end_date, status, payment_method, created_at, updated_at) 
              VALUES ($1, $2, $3, $4, 'confirmed', 'stripe', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`,
             [user_id, property_id, start_date, end_date]
           );
-        } else {
+        } else if (property_id) {
           // Mark property as sold
           await pool.query(
             `UPDATE properties SET status = 'sold' WHERE id = $1`,
@@ -46,13 +58,14 @@ const handleStripeWebhook = async (req: Request, res: Response) => {
         }
       }
       break;
+    }
     // Handle other event types as needed
     default:
-      console.log(`Unhandled event type ${event.type}`);
+      return res.status(400).send(`Unhandled event type ${event.type}`);
   }
 
   // Return a response to acknowledge receipt of the event
-  res.json({ received: true });
+  return res.json({ received: true });
 };
 
 export { handleStripeWebhook };

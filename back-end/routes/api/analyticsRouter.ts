@@ -1,10 +1,14 @@
 import { Router } from "express";
-import { getAnalytics } from "../../controllers/analyticsControllers";
+import {
+  getDashboardAnalytics,
+  getPropertyPerformance,
+  getUserEngagement,
+} from "../../controllers/analyticsControllers";
+
 const analyticsRouter = Router();
 
-
-analyticsRouter.route("/").get(getAnalytics);
-
+analyticsRouter.route("/dashboard").get(getDashboardAnalytics);
+analyticsRouter.route("/property/:property_id").get(getPropertyPerformance);
+analyticsRouter.route("/engagement").get(getUserEngagement);
 
 export default analyticsRouter;
-

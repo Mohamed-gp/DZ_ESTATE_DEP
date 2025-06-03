@@ -4,72 +4,78 @@ import pool from "../config/connectDb";
 import { authRequest } from "../interfaces/authInterface";
 import stripe from "../utils/stripe";
 
+interface JwtPayload {
+  id: string;
+  role?: string;
+}
+
 const verifyAccessToken = (
   req: authRequest,
   res: Response,
   next: NextFunction
-) => {
+): Response | void => {
   const accessToken = req.cookies.accessToken;
-  console.log(accessToken);
-  if (!accessToken)
-    return res.status(401).json({ message: "User not authenticated" });
-  const { ACCESS_TOKEN_SECRET } = process.env;
+  const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET;
+
+  if (!accessToken) {
+    return res.status(401).json({ message: "Access token required" });
+  }
   if (!ACCESS_TOKEN_SECRET) {
     return res.status(500).json({ message: "Server configuration error" });
   }
-  jwt.verify(accessToken, ACCESS_TOKEN_SECRET, (err, decoded) => {
-    if (err) {
-      console.log(err);
-      return res.status(403).json("Token is not valid");
-    } else {
-      console.log(decoded.id);
-      req.user = { id: decoded.id };
-      console.log(req.user);
-      next();
+
+  jwt.verify(
+    accessToken,
+    ACCESS_TOKEN_SECRET,
+    (err: Error | null, decoded: any) => {
+      if (err) {
+        return res.status(403).json({ message: "Invalid token" });
+      }
+      req.user = decoded as JwtPayload;
+      return next();
     }
-  });
+  );
 };
 
-const verifyUser = (req: authRequest, res: Response, next: NextFunction) => {
+const verifyUser = (
+  req: authRequest,
+  res: Response,
+  next: NextFunction
+): Response | void => {
   verifyAccessToken(req, res, () => {
-    if (req.user.id !== req.params.userId)
-      return res.status(403).json({ message: "Forbidden" });
-    next();
-  });
-};
-
-const verifyAdmin = async (
-  req: authRequest,
-  res: Response,
-  next: NextFunction
-) => {
-  verifyAccessToken(req, res, async () => {
-    const user = await pool.query("SELECT * FROM users WHERE id = $1", [
-      req.user.id,
-    ]);
-    if (user.rows[0].role !== "admin")
-      return res.status(403).json({ message: "Forbidden" });
-
-    next();
-  });
-};
-const verifyAdminOrUser = async (
-  req: authRequest,
-  res: Response,
-  next: NextFunction
-) => {
-  verifyAccessToken(req, res, async () => {
-    const user = await pool.query("SELECT * FROM users WHERE id = $1", [
-      req.user.id,
-    ]);
-    if (
-      user.rows[0].role === "admin" ||
-      user.rows[0].id === req.params.userId
-    ) {
-      next();
-    } else {
+    if (!req.user || req.user.id !== req.params.userId) {
       return res.status(403).json({ message: "Forbidden" });
     }
+    return next();
+  });
+};
+
+const verifyAdmin = (
+  req: authRequest,
+  res: Response,
+  next: NextFunction
+): Response | void => {
+  verifyAccessToken(req, res, () => {
+    if (!req.user || req.user.role !== "admin") {
+      return res.status(403).json({ message: "Admin access required" });
+    }
+    return next();
+  });
+};
+
+const verifyAdminOrUser = (
+  req: authRequest,
+  res: Response,
+  next: NextFunction
+): Response | void => {
+  verifyAccessToken(req, res, () => {
+    if (
+      !req.user ||
+      (req.user.role !== "admin" && req.user.id !== req.params.userId)
+    ) {
+      return res.status(403).json({ message: "Forbidden" });
+    }
+    return next();
   });
 };
 
@@ -77,11 +83,12 @@ const upgradeToPremium = async (
   req: authRequest,
   res: Response,
   next: NextFunction
-) => {
-  const user_id = req.user.id;
+): Promise<Response | void> => {
+  if (!req.user?.id) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
 
   try {
-    // Create a Stripe Checkout Session for the subscription upgrade
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       line_items: [
@@ -91,7 +98,7 @@ const upgradeToPremium = async (
             product_data: {
               name: "Premium Subscription",
             },
-            unit_amount: 1000, // Example amount in cents ($10.00)
+            unit_amount: 1000,
             recurring: {
               interval: "month",
             },
@@ -100,10 +107,10 @@ const upgradeToPremium = async (
         },
       ],
       mode: "subscription",
-      success_url: `${process.env.CLIENT_URL}`,
-      cancel_url: `${process.env.CLIENT_URL}`,
+      success_url: `${process.env.CLIENT_URL}/subscription-success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.CLIENT_URL}/subscription-cancel`,
       metadata: {
-        user_id: user_id,
+        user_id: req.user.id,
       },
     });
 
@@ -112,10 +119,9 @@ const upgradeToPremium = async (
       message: "Subscription session created successfully",
     });
   } catch (error) {
-    console.error("Error processing request:", error);
-    return res
-      .status(500)
-      .json({ message: "An error occurred while processing the request" });
+    return res.status(500).json({
+      message: "An error occurred while processing the request",
+    });
   }
 };
 

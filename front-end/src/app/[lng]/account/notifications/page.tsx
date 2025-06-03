@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { formatDistanceToNow } from "date-fns";
 import { Bell, CheckCircle, AlertCircle, Info } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { useTranslation } from "react-i18next";
 
 interface Notification {
   id: string;
@@ -28,6 +29,7 @@ const getNotificationIcon = (type: string) => {
 };
 
 export default function NotificationsPage() {
+  const { t } = useTranslation();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
@@ -70,11 +72,11 @@ export default function NotificationsPage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
-        <h1 className="mb-6 text-2xl font-bold">Notifications</h1>
+        <h1 className="mb-6 text-2xl font-bold">{t("notifications.title")}</h1>
         <div className="relative">
           <Input
             type="text"
-            placeholder="Search Notifications"
+            placeholder={t("notifications.searchPlaceholder")}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-10"
@@ -96,9 +98,9 @@ export default function NotificationsPage() {
           {filteredNotifications.length === 0 ? (
             <div className="flex h-[calc(100%-100px)] flex-col items-center justify-center p-8 text-center text-gray-500">
               <Bell className="mx-auto mb-4 text-gray-300" size={64} />
-              <p className="text-xl">No notifications yet</p>
+              <p className="text-xl">{t("notifications.noNotifications")}</p>
               <p className="text-sm text-gray-400">
-                You&apos;re all caught up!
+                {t("notifications.allCaughtUp")}
               </p>
             </div>
           ) : (

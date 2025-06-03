@@ -1,11 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ChevronLeft, ChevronRight, Search, Trash } from "lucide-react";
+import { ChevronLeft, ChevronRight, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import customAxios from "@/utils/customAxios";
-import useBoundStore from "@/store/store";
 import toast from "react-hot-toast";
 import PropertyCard from "@/components/propertyCard/PropertyCard";
 
@@ -16,14 +15,12 @@ export default function PropertiesPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
-  const { user } = useBoundStore((state) => state);
 
   const fetchProperties = async () => {
     try {
       setLoading(true);
       const { data } = await customAxios.get(`/user/wishlist`);
       setProperties(data.data);
-      console.log(data.data);
     } catch (error) {
       
       toast.error(error.response.data.message);

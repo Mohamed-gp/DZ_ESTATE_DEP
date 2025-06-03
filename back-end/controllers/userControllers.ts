@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import pool from "../config/connectDb";
 import { authRequest } from "../interfaces/authInterface";
-import Stripe from "stripe";
+import stripe from "../utils/stripe";
 
 const getUserInfo = async (req: Request, res: Response) => {
   const { id } = req.params;
@@ -63,14 +63,11 @@ const getUserProperties = async (
   req: authRequest,
   res: Response,
   next: NextFunction
-) => {
+): Promise<Response | void> => {
   try {
     let { page = "1", limit = "7", searchText = "" } = req.query;
-    const { userId } = req.params; //
-    console.log(userId);
-    console.log({ page, limit });
+    const { userId } = req.params;
 
-    // Initialisation de la requête
     let query = `
         SELECT 
           properties.*,
@@ -84,41 +81,31 @@ const getUserProperties = async (
         LEFT JOIN property_assets ON properties.id = property_assets.property_id
         WHERE properties.owner_id = $1
       `;
-    let queryValues: any[] = [userId]; // Ajouter l'ID de l'utilisateur pour la clause WHERE
+    let queryValues: any[] = [userId];
     let index = 2;
 
-    // Recherche textuelle
     if (searchText) {
       query += ` AND (properties.title ILIKE $${index} OR properties.description ILIKE $${index})`;
       queryValues.push(`%${searchText}%`);
       index++;
     }
 
-    // Regrouper par ID des propriétés
     query += ` GROUP BY properties.id`;
 
-    // Pagination
     if (page && limit) {
       const startIndex = (+page - 1) * +limit;
       query += ` LIMIT $${index} OFFSET $${index + 1}`;
       queryValues.push(+limit, startIndex);
     }
 
-    // Exécution de la requête
     const userProperties = await pool.query(query, queryValues);
 
-    // Vérification des résultats
-    if (!userProperties.rows.length) {
-      return res.json({ message: "Aucune propriété trouvée.", data: null });
-    }
-
-    // Retour des données
     return res.json({
       data: userProperties.rows,
       message: "Properties Fetched Successfully.",
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -126,13 +113,14 @@ const getUserPropertiesWishlist = async (
   req: authRequest,
   res: Response,
   next: NextFunction
-) => {
+): Promise<Response | void> => {
   try {
-    let { page = "1", limit = "7", searchText = "" } = req.query;
-    const { id } = req.user;
-    console.log("test");
+    if (!req.user?.id) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
 
-    // Initialisation de la requête
+    let { page = "1", limit = "7", searchText = "" } = req.query;
+
     let query = `
         SELECT 
           properties.*,
@@ -147,44 +135,31 @@ const getUserPropertiesWishlist = async (
         LEFT JOIN property_assets ON properties.id = property_assets.property_id
         WHERE wishlists.user_id = $1
       `;
-    let queryValues: any[] = [id]; // Ajouter l'ID de l'utilisateur pour la clause WHERE
+    let queryValues: any[] = [req.user.id];
     let index = 2;
 
-    // Recherche textuelle
     if (searchText) {
       query += ` AND (properties.title ILIKE $${index} OR properties.description ILIKE $${index})`;
       queryValues.push(`%${searchText}%`);
       index++;
     }
 
-    // Regrouper par ID des propriétés
     query += ` GROUP BY properties.id`;
 
-    // Pagination
     if (page && limit) {
       const startIndex = (+page - 1) * +limit;
       query += ` LIMIT $${index} OFFSET $${index + 1}`;
       queryValues.push(+limit, startIndex);
     }
 
-    // Exécution de la requête
     const wishlistProperties = await pool.query(query, queryValues);
 
-    // Vérification des résultats
-    if (!wishlistProperties.rows.length) {
-      return res.json({
-        message: "Aucune propriété trouvée dans la wishlist.",
-        data: null,
-      });
-    }
-
-    // Retour des données
     return res.json({
       data: wishlistProperties.rows,
       message: "Wishlist Fetched Successfully.",
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -192,32 +167,32 @@ const togglePropertyInWishlist = async (
   req: authRequest,
   res: Response,
   next: NextFunction
-) => {
+): Promise<Response | void> => {
   try {
-    const { propertyId } = req.params; // ID of the property
-    const userId = req.user.id; // ID of the user (extracted from authentication)
+    if (!req.user?.id) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
 
-    // Check if the property is already in the wishlist
+    const { propertyId } = req.params;
+    const userId = req.user.id;
+
     const existingWishlistEntry = await pool.query(
       `SELECT * FROM wishlists WHERE user_id = $1 AND property_id = $2`,
       [userId, propertyId]
     );
 
     if (existingWishlistEntry.rows.length > 0) {
-      // The property is already in the wishlist, remove it
       await pool.query(
         `DELETE FROM wishlists WHERE user_id = $1 AND property_id = $2`,
         [userId, propertyId]
       );
     } else {
-      // The property is not in the wishlist, add it
       await pool.query(
         `INSERT INTO wishlists (user_id, property_id) VALUES ($1, $2)`,
         [userId, propertyId]
       );
     }
 
-    // Fetch the updated wishlist
     const updatedWishlist = await pool.query(
       `SELECT properties.* FROM properties
          JOIN wishlists ON properties.id = wishlists.property_id
@@ -233,23 +208,20 @@ const togglePropertyInWishlist = async (
       wishlist: updatedWishlist.rows,
     });
   } catch (error) {
-    next(error); // Handle errors
+    return next(error);
   }
 };
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: "2024-12-18.acacia",
-});
 
 const upgradeUserProfile = async (
   req: authRequest,
   res: Response,
   next: NextFunction
-) => {
-  const user_id = req.user.id;
+): Promise<Response | void> => {
+  if (!req.user?.id) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
 
   try {
-    // Create a Stripe Checkout Session for the subscription upgrade
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       line_items: [
@@ -259,7 +231,7 @@ const upgradeUserProfile = async (
             product_data: {
               name: "Premium Subscription",
             },
-            unit_amount: 1000, // Example amount in cents ($10.00)
+            unit_amount: 1000, // $10.00 in cents
             recurring: {
               interval: "month",
             },
@@ -271,7 +243,7 @@ const upgradeUserProfile = async (
       success_url: `${process.env.CLIENT_URL}/subscription-success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.CLIENT_URL}/subscription-cancel`,
       metadata: {
-        user_id: user_id,
+        user_id: req.user.id,
       },
     });
 
@@ -280,10 +252,10 @@ const upgradeUserProfile = async (
       message: "Subscription session created successfully",
     });
   } catch (error) {
-    console.error("Error processing request:", error);
-    return res
-      .status(500)
-      .json({ message: "An error occurred while processing the request" });
+    console.error("Error in upgradeUserProfile:", error);
+    return res.status(500).json({
+      message: "An error occurred while processing the request",
+    });
   }
 };
 

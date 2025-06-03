@@ -8,7 +8,7 @@ const ContactUs: React.FC = () => {
       <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-10 text-white">
         <h2 className="text-2xl font-bold tracking-tight">Get in Touch</h2>
         <p className="mt-2 text-blue-100">
-          We're here to help with any questions about our properties
+          We&apos;re here to help with any questions about our properties
         </p>
       </div>
 
@@ -24,10 +24,11 @@ const ContactUs: React.FC = () => {
                 Our friendly team is here to help
               </p>
               <a
-                href="mailto:estin@estin.dz"
+                href="mailto:mohamedterba6@gmail.com"
+                target="_blank"
                 className="mt-2 inline-block text-blue-600 transition-colors hover:text-blue-700"
               >
-                estin@estin.dz
+                mohamedterba6@gmail.com
               </a>
             </div>
           </div>
@@ -56,20 +57,13 @@ const ContactUs: React.FC = () => {
               <h3 className="text-lg font-medium text-gray-900">Visit Us</h3>
               <p className="mt-1 text-gray-600">Come say hello at our office</p>
               <p className="mt-2 text-gray-800">
-                ESTIN Campus, Sidi Abdellah, Algeria
+                Usa street, 123, City, Country
               </p>
             </div>
           </div>
         </div>
 
-        <div className="mt-8 grid">
-          <button
-            type="button"
-            className="flex w-full items-center justify-center rounded-lg bg-blue-600 px-5 py-3 text-base font-medium text-white transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            Contact Support
-          </button>
-        </div>
+        
       </div>
     </div>
   );

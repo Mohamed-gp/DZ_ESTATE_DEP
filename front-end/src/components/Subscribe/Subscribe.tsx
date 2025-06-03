@@ -2,7 +2,37 @@
 import customAxios from "@/utils/customAxios";
 import React, { useState } from "react";
 import toast from "react-hot-toast";
-import { Bell, Loader2 } from "lucide-react";
+import {
+  Bell,
+  Loader2,
+  Facebook,
+  Twitter,
+  Instagram,
+  Linkedin,
+} from "lucide-react";
+
+const socialMediaLinks = [
+  {
+    name: "Facebook",
+    icon: Facebook,
+    url: "https://facebook.com",
+  },
+  {
+    name: "Twitter",
+    icon: Twitter,
+    url: "https://twitter.com",
+  },
+  {
+    name: "Instagram",
+    icon: Instagram,
+    url: "https://instagram.com",
+  },
+  {
+    name: "LinkedIn",
+    icon: Linkedin,
+    url: "https://linkedin.com",
+  },
+];
 
 const Subscribe: React.FC = () => {
   const [email, setEmail] = useState("");
@@ -48,8 +78,8 @@ const Subscribe: React.FC = () => {
               Thanks for subscribing!
             </h3>
             <p className="mt-2 text-sm text-gray-600">
-              You'll now receive updates on our latest properties and special
-              offers.
+              You&apos;ll now receive updates on our latest properties and
+              special offers.
             </p>
             <button
               onClick={() => setIsSubscribed(false)}
@@ -122,13 +152,16 @@ const Subscribe: React.FC = () => {
         </div>
 
         <div className="mt-6 grid grid-cols-4 gap-3">
-          {["Facebook", "Twitter", "Instagram", "LinkedIn"].map((social) => (
+          {socialMediaLinks.map((social) => (
             <a
-              key={social}
-              href="#"
-              className="flex items-center justify-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-600 shadow-sm hover:bg-gray-50"
+              key={social.name}
+              href={social.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`Follow us on ${social.name}`}
+              className="flex items-center justify-center rounded-md border border-gray-300 bg-white p-2 text-sm font-medium text-gray-600 shadow-sm transition-colors hover:bg-gray-50 hover:text-indigo-600"
             >
-              {social.charAt(0)}
+              <social.icon size={18} strokeWidth={2} />
             </a>
           ))}
         </div>

@@ -19,6 +19,7 @@
 
 # production
 /build
+/dist
 
 # misc
 .DS_Store
@@ -33,10 +34,17 @@ yarn-error.log*
 .env*
 !.env.example
 
-
 # vercel
 .vercel
 
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Compiled JavaScript files (TypeScript should be used in source)
+*.js
+*.js.map
+!jest.config.js
+!next.config.js
+!tailwind.config.js
+!postcss.config.js

@@ -56,6 +56,7 @@ const subscribeToNewsletter = async (
     });
   } catch (error) {
     next(error);
+    return;
   }
 };
 

@@ -71,7 +71,7 @@ const sendMessageController = async (
   req: Request,
   res: ioResponse,
   next: NextFunction
-) => {
+): Promise<Response | void> => {
   const { room_id, user_id, message } = req.body;
 
   if (!room_id || !user_id || !message) {
@@ -79,22 +79,25 @@ const sendMessageController = async (
   }
 
   try {
-    // Insert the message into the database
     const newMessage = await pool.query(
       "INSERT INTO messages (room_id, sender_id, message, created_at) VALUES ($1, $2, $3, CURRENT_TIMESTAMP) RETURNING *",
       [room_id, user_id, message]
     );
 
-    // Emit the message to all connected clients
-    res.io.emit("new_message", newMessage.rows[0]);
+    if (res.io) {
+      res.io.emit("new_message", newMessage.rows[0]);
+    }
 
-    res.status(201).json({
+    return res.status(201).json({
       message: "Message sent successfully.",
       data: newMessage.rows[0],
     });
-  } catch (err) {
-    console.error("Error in sendMessageController:", err.message);
-    next(err);
+  } catch (error) {
+    console.error(
+      "Error in sendMessageController:",
+      error instanceof Error ? error.message : "Unknown error"
+    );
+    return next(error);
   }
 };
 
@@ -108,7 +111,7 @@ const getMessagesController = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {
+): Promise<Response | void> => {
   const { room_id } = req.params;
 
   if (!room_id) {
@@ -116,19 +119,17 @@ const getMessagesController = async (
   }
 
   try {
-    // Fetch messages for the chat
     const messages = await pool.query(
       "SELECT * FROM messages WHERE room_id = $1 ORDER BY created_at ASC",
       [room_id]
     );
 
-    res.status(200).json({
+    return res.status(200).json({
       data: messages.rows,
       message: "Messages fetched successfully.",
     });
-  } catch (err) {
-    console.log("Error in getMessagesController:", err.message);
-    next(err);
+  } catch (error) {
+    return next(error);
   }
 };
 
@@ -142,35 +143,34 @@ const getUserConversationsController = async (
   req: authRequest,
   res: Response,
   next: NextFunction
-) => {
-  const user_id = req.user.id;
-
-  if (!user_id) {
-    return res.status(400).json({ message: "User ID is required." });
+): Promise<Response | void> => {
+  const user = req.user;
+  if (!user?.id) {
+    return res.status(401).json({ message: "Unauthorized" });
   }
 
   try {
-    // Query to fetch all conversations for the user
     const conversations = await pool.query(
-      `
-        SELECT r.id AS room_id, r.created_at, r.picture,
-            json_agg(json_build_object('user_id', u.id, 'username', u.username)) AS participants
-        FROM rooms r
-        INNER JOIN users u ON u.id = ANY(ARRAY[r.user1_id, r.user2_id])
-        WHERE r.user1_id = $1 OR r.user2_id = $1
-        GROUP BY r.id
-        ORDER BY r.created_at DESC
-        `,
-      [user_id]
+      `SELECT r.id AS room_id, r.created_at, r.picture,
+          json_agg(json_build_object('user_id', u.id, 'username', u.username)) AS participants
+      FROM rooms r
+      INNER JOIN users u ON u.id = ANY(ARRAY[r.user1_id, r.user2_id])
+      WHERE r.user1_id = $1 OR r.user2_id = $1
+      GROUP BY r.id
+      ORDER BY r.created_at DESC`,
+      [user.id]
     );
 
-    res.status(200).json({
+    return res.status(200).json({
       data: conversations.rows,
       message: "Conversations fetched successfully.",
     });
-  } catch (err) {
-    console.error("Error in getUserConversationsController:", err.message);
-    next(err);
+  } catch (error) {
+    console.error(
+      "Error in getUserConversationsController:",
+      error instanceof Error ? error.message : "Unknown error"
+    );
+    return next(error);
   }
 };
 

@@ -14,15 +14,7 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
-import {
-  User,
-  Mail,
-  Phone,
-  Shield,
-  Moon,
-  Globe,
-  DollarSign,
-} from "lucide-react";
+import { User, Mail, Phone, Shield, Moon, Globe } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { usePathname, useRouter } from "next/navigation";
 import i18nConfig from "../../../../../i18nConfig";
@@ -32,6 +24,7 @@ export default function ProfileSettingsPage() {
     (state) => state,
   );
   const [darkTheme, setDarkTheme] = useState(false);
+  const { t } = useTranslation();
 
   const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,7 +35,7 @@ export default function ProfileSettingsPage() {
     console.log(currentPassword, newPassword, confirmNewPassword);
 
     if (newPassword !== confirmNewPassword) {
-      toast.error("Passwords do not match");
+      toast.error(t("settings.passwordsDoNotMatch"));
       return;
     }
 
@@ -98,14 +91,14 @@ export default function ProfileSettingsPage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
-        <h1 className="mb-6 text-2xl font-bold">Profile Settings</h1>
+        <h1 className="mb-6 text-2xl font-bold">{t("settings.title")}</h1>
       </div>
 
       <div className="flex flex-col items-center">
         <div className="relative h-24 w-24">
           <Image
             src={user?.profile_image}
-            alt="Profile"
+            alt={t("settings.profileAlt")}
             className="rounded-full object-cover"
             layout="fill"
           />
@@ -116,12 +109,14 @@ export default function ProfileSettingsPage() {
 
       <div className="mx-auto mt-8">
         <div className="mb-6 rounded-lg bg-white p-6 shadow-md">
-          <h2 className="mb-4 text-xl font-semibold">User Information</h2>
+          <h2 className="mb-4 text-xl font-semibold">
+            {t("settings.userInformation")}
+          </h2>
           <div className="mb-4 flex items-center">
             <User className="mr-2 text-gray-500" />
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Username
+                {t("settings.username")}
               </label>
               <p className="font-bold text-gray-800">{user?.username}</p>
             </div>
@@ -130,7 +125,7 @@ export default function ProfileSettingsPage() {
             <Shield className="mr-2 text-gray-500" />
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Role
+                {t("settings.role")}
               </label>
               <p className="font-bold text-gray-800">{user?.role}</p>
             </div>
@@ -139,7 +134,7 @@ export default function ProfileSettingsPage() {
             <Mail className="mr-2 text-gray-500" />
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Email
+                {t("settings.email")}
               </label>
               <p className="font-bold text-gray-800">{user?.email}</p>
             </div>
@@ -148,11 +143,11 @@ export default function ProfileSettingsPage() {
             <Phone className="mr-2 text-gray-500" />
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Phone Number
+                {t("settings.phoneNumber")}
               </label>
               {user?.phone_number == null ? (
                 <p className="font-bold text-gray-800">
-                  (You didn&apos;t put any phone number)
+                  {t("settings.noPhoneNumber")}
                 </p>
               ) : (
                 <p className="font-bold text-gray-800">{user?.phone_number}</p>
@@ -162,11 +157,13 @@ export default function ProfileSettingsPage() {
         </div>
 
         <div className="mb-6 rounded-lg bg-white p-6 shadow-md">
-          <h2 className="mb-4 text-xl font-semibold">Settings</h2>
+          <h2 className="mb-4 text-xl font-semibold">
+            {t("settings.settings")}
+          </h2>
           <div className="mb-4 flex items-center justify-between">
             <label className="flex items-center text-sm font-medium text-gray-700">
               <Moon className="mr-2 text-gray-500" />
-              Dark Theme (Coming Soon)
+              {t("settings.darkTheme")}
             </label>
             <Switch
               checked={darkTheme}
@@ -178,7 +175,7 @@ export default function ProfileSettingsPage() {
           <div className="mb-4">
             <label className="flex items-center text-sm font-medium text-gray-700">
               <Globe className="mr-2 text-gray-500" />
-              Language
+              {t("settings.language")}
             </label>
             <Select
               defaultValue={language}
@@ -196,40 +193,21 @@ export default function ProfileSettingsPage() {
               </SelectContent>
             </Select>
           </div>
-          {/* <div className="mb-4">
-            <label className="flex items-center text-sm font-medium text-gray-700">
-              <DollarSign className="mr-2 text-gray-500" />
-              Currency
-            </label>
-            <Select
-              value={currency}
-              onValueChange={(value) => {
-                changeCurrency(value);
-              }}
-            >
-              <SelectTrigger className="mt-1 block w-full focus-visible:ring-transparent" />
-              <SelectContent>
-                {CURRENCY_LIST.map((option) => (
-                  <SelectItem key={option} value={option}>
-                    {option}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div> */}
         </div>
         {user?.provider == "credentials" && (
           <form
             onSubmit={handlePasswordChange}
             className="rounded-lg bg-white p-6 shadow-md"
           >
-            <h2 className="mb-4 text-xl font-semibold">Change Password</h2>
+            <h2 className="mb-4 text-xl font-semibold">
+              {t("settings.changePassword")}
+            </h2>
             <div className="mb-4">
               <label
                 htmlFor="currentPassword"
                 className="block text-sm font-medium text-gray-700"
               >
-                Current Password
+                {t("settings.currentPassword")}
               </label>
               <Input
                 type="password"
@@ -244,7 +222,7 @@ export default function ProfileSettingsPage() {
                 htmlFor="newPassword"
                 className="block text-sm font-medium text-gray-700"
               >
-                New Password
+                {t("settings.newPassword")}
               </label>
               <Input
                 type="password"
@@ -259,7 +237,7 @@ export default function ProfileSettingsPage() {
                 htmlFor="confirmPassword"
                 className="block text-sm font-medium text-gray-700"
               >
-                Confirm New Password
+                {t("settings.confirmNewPassword")}
               </label>
               <Input
                 type="password"
@@ -273,7 +251,7 @@ export default function ProfileSettingsPage() {
               type="submit"
               className="w-full bg-blue-500 text-white ring-0 focus:outline-none focus:ring-0"
             >
-              Update Password
+              {t("settings.updatePassword")}
             </Button>
           </form>
         )}

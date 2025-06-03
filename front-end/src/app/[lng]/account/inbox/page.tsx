@@ -8,8 +8,10 @@ import customAxios from "@/utils/customAxios";
 import toast from "react-hot-toast";
 import { io } from "socket.io-client";
 import Image from "next/image";
+import { useTranslation } from "react-i18next";
 
 const InboxPage = () => {
+  const { t } = useTranslation();
   const [rooms, setRooms] = useState<any[]>([]);
   const [messages, setMessages] = useState<any[]>([]);
   const [selectedRoom, setSelectedRoom] = useState(null);
@@ -113,12 +115,12 @@ const InboxPage = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
-        <h1 className="mb-6 text-2xl font-bold">Inbox</h1>
+        <h1 className="mb-6 text-2xl font-bold">{t("inbox.title")}</h1>
         <div className="relative">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-gray-400" />
           <Input
             type="text"
-            placeholder="Search Rooms"
+            placeholder={t("inbox.searchPlaceholder")}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-10"
@@ -150,7 +152,9 @@ const InboxPage = () => {
                 </div>
               ))
             ) : (
-              <div className="text-center text-gray-500">You have no rooms</div>
+              <div className="text-center text-gray-500">
+                {t("inbox.noRooms")}
+              </div>
             )}
           </div>
         </div>
@@ -173,7 +177,7 @@ const InboxPage = () => {
               <div className="flex items-center gap-2">
                 <Input
                   type="text"
-                  placeholder="Type a message"
+                  placeholder={t("inbox.messagePlaceholder")}
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
                   className="flex-1"
@@ -182,13 +186,13 @@ const InboxPage = () => {
                   onClick={sendMessage}
                   className="rounded bg-blue-500 px-4 py-2 text-white"
                 >
-                  Send
+                  {t("inbox.send")}
                 </button>
               </div>
             </div>
           ) : (
             <div className="flex h-full items-center justify-center text-gray-500">
-              Select a room to start chatting
+              {t("inbox.selectRoom")}
             </div>
           )}
         </div>

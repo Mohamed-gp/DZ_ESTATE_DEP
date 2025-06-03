@@ -12,21 +12,23 @@ import featuresRouter from "./api/featuresRouter";
 import subscribersRouter from "./api/subscribersRouter";
 import reviewsRouter from "./api/reviewsRouter";
 import reservationsRouter from "./api/reservationsRouter";
+import dashboardRouter from "./api/dashboardRouter";
 
 const router = Router();
 
 router.use("/auth", authRouter);
-router.use("/user", userRouter);
 router.use("/properties", propertiesRouter);
-router.use("/categories", categoriesRouter);
-router.use("/chat", chatRouter);
-router.use("/analytics", analyticsRouter);
-router.use("/notifications", notificationRouter);
-router.use("/admin", adminRouter);
-router.use("/features", featuresRouter);
-router.use("/subscribers", subscribersRouter);
+router.use("/users", userRouter);
 router.use("/reservations", reservationsRouter);
 router.use("/reviews", reviewsRouter);
-router.use("/webhook", stripeRouter);
+router.use("/categories", categoriesRouter);
+router.use("/subscribers", subscribersRouter);
+router.use("/features", featuresRouter);
+router.use("/stripe", stripeRouter);
+router.use("/chat", chatRouter);
+router.use("/dashboard", dashboardRouter);
+router.use("/admin", adminRouter);
+router.use("/analytics", analyticsRouter);
+router.use("/notifications", notificationRouter);
 
 export default router;

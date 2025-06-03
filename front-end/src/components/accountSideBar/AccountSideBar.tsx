@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import {
   Settings,
   Inbox,
@@ -14,6 +14,7 @@ import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import customAxios from "@/utils/customAxios";
 import useBoundStore from "@/store/store";
+import { useTranslation } from "react-i18next";
 
 interface MenuItem {
   name: string;
@@ -22,6 +23,7 @@ interface MenuItem {
 }
 
 const SideBar = () => {
+  const { t } = useTranslation();
   const pathname = usePathname();
   const router = useRouter();
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -63,24 +65,24 @@ const SideBar = () => {
   const menuItems: MenuItem[] = useMemo(
     () => [
       {
-        name: "Inbox",
+        name: t("sidebar.inbox"),
         link: "/account/inbox",
         icon: Inbox,
       },
-      { name: "Posts", link: "/account/posts", icon: FileText },
-      { name: "Wishlist", link: "/account/wishlist", icon: Heart },
+      { name: t("sidebar.posts"), link: "/account/posts", icon: FileText },
+      { name: t("sidebar.wishlist"), link: "/account/wishlist", icon: Heart },
       {
-        name: "Upgrade Profile",
+        name: t("sidebar.upgradeProfile"),
         link: "/account/upgradeProfile",
         icon: ArrowUpCircle,
       },
       {
-        name: "Settings",
+        name: t("sidebar.settings"),
         link: "/account/settings",
         icon: Settings,
       },
     ],
-    [],
+    [t],
   );
 
   const [activeIndex, setActiveIndex] = useState<number>(0);
@@ -96,7 +98,7 @@ const SideBar = () => {
       router.push("/");
       toast.success(data.message);
     } catch (err) {
-      toast.error(err.response?.data?.message || "Logout failed");
+      toast.error(err.response?.data?.message || t("auth.logoutFailed"));
     }
   };
 
@@ -167,7 +169,7 @@ const SideBar = () => {
               onClick={logoutHandler}
               className="w-3/4 rounded bg-blue-500 py-2 text-base text-white focus:outline-none"
             >
-              Log Out
+              {t("auth.logout")}
             </button>
           </footer>
         </div>
@@ -181,7 +183,7 @@ const SideBar = () => {
           ) : (
             <ChevronRight className="h-4 w-4 scale-150 transform" />
           )}
-          <span className="sr-only">Toggle Sidebar</span>
+          <span className="sr-only">{t("sidebar.toggleSidebar")}</span>
         </button>
       </aside>
     </>

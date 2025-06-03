@@ -1,129 +1,335 @@
-# DZ-Estate
+# 🏠 Property Rentals Platform
 
-DZ-Estate is a real estate web application built with Next.js for the frontend and FastAPI for the backend.
+A modern, full-stack property rental platform built with Next.js, TypeScript, Node.js, and PostgreSQL. This platform allows users to list, search, and rent properties with integrated payment processing and real-time chat functionality.
 
-## Features
+## ✨ Features
 
-- Property listings
-- User authentication
-- Property search and filter
-- Responsive design
-- and more...
+### 🔍 Property Management
 
-## Technologies
+- **Advanced Search & Filtering**: Search by location, price range, category, and keywords
+- **Image & Video Upload**: Multiple media upload with Cloudinary integration
+- **Interactive Maps**: Location visualization with Leaflet
+- **Property Reviews**: Rating and review system for properties
+
+### 💳 Payment Integration
+
+- **Stripe Integration**: Secure payment processing for bookings
+- **Reservation System**: Date-based booking with availability checking
+- **Transaction History**: Complete payment and booking records
+
+### 👥 User Features
+
+- **Authentication**: JWT-based secure login/registration
+- **User Profiles**: Customizable user profiles with image upload
+- **Wishlist**: Save favorite properties
+- **Real-time Chat**: Socket.io powered messaging between users
+
+### 🌐 Multi-language Support
+
+- **i18n**: Support for English, French, and Arabic
+- **RTL Support**: Right-to-left layout for Arabic
+
+### 📊 Admin Dashboard
+
+- **Analytics**: Property and user statistics
+- **User Management**: Admin controls for user accounts
+- **Content Moderation**: Review and approve listings
+
+## 🛠️ Tech Stack
 
 ### Frontend
 
-- [Next.js](https://nextjs.org/): A React framework for production.
+- **Framework**: Next.js 14 with App Router
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **UI Components**: Custom components with Headless UI
+- **Maps**: Leaflet/React-Leaflet
+- **Forms**: React Hook Form with validation
+- **State Management**: Zustand
+- **Internationalization**: next-i18next
 
 ### Backend
 
-- [FastAPI](https://fastapi.tiangolo.com/): A modern, fast (high-performance), web framework for building APIs with Python 3.6+.
+- **Runtime**: Node.js
+- **Framework**: Express.js
+- **Language**: TypeScript
+- **Database**: PostgreSQL with connection pooling
+- **Authentication**: JWT
+- **File Upload**: Cloudinary
+- **Payment**: Stripe
+- **Real-time**: Socket.io
+- **Email**: Nodemailer
 
-## Getting Started
+### DevOps & Deployment
+
+- **Containerization**: Docker & Docker Compose
+- **Testing**: Jest for unit tests, Cypress for E2E
+- **CI/CD**: GitHub Actions ready
+- **Database**: Supabase (PostgreSQL)
+- **Hosting**: Production-ready configurations
+
+## 🚀 Quick Start
 
 ### Prerequisites
 
-- Node.js
-- Python 3.6+
-- FastAPI
-- PostgreSQL (or any preferred database)
+- Node.js 18+ and npm/yarn
+- PostgreSQL database
+- Cloudinary account
+- Stripe account
 
-### Installation
+### 1. Clone the Repository
 
-1. Clone the repository:
+```bash
+git clone <repository-url>
+cd property-rentals
+```
 
-   ```bash
-   git clone https://github.com/yourusername/DZ-Estate.git
-   cd DZ-Estate
-   ```
+### 2. Backend Setup
 
-2. Install frontend dependencies:
+```bash
+cd back-end
+npm install
 
-   ```bash
-   cd frontend
-   npm install
-   ```
+# Copy environment variables
+cp .env.example .env
+# Edit .env with your actual values
 
-3. Install backend dependencies:
-   ```bash
-   cd backend
-   pip install -r requirements.txt
-   ```
+# Run database migrations
+npm run migrate
 
-### Running the Application
+# Start development server
+npm run dev
+```
 
-1. Start the backend server:
+### 3. Frontend Setup
 
-   ```bash
-   cd backend
-   uvicorn main:app --reload
-   ```
+```bash
+cd front-end
+npm install
 
-2. Start the frontend server:
+# Start development server
+npm run dev
+```
 
-   ```bash
-   cd frontend
-   npm run dev
-   ```
+### 4. Using Docker (Recommended)
 
-3. Open your browser and navigate to `http://localhost:3000`
+```bash
+# From project root
+docker-compose up -d
+```
 
-## Contributing
+## ⚙️ Environment Configuration
 
-Contributions are welcome! Please read the [contributing guidelines](CONTRIBUTING.md) first.
+### Backend (.env)
 
-## License
+```env
+# Server
+PORT=5000
+NODE_ENV=development
+FRONTEND_URL=http://localhost:3000
 
-This project is licensed under the MIT License.
+# Database
+DATABASE_PROD_URL=postgresql://user:pass@host:port/db
+DATABASE_DEV_URL=postgresql://localhost:5432/property_rentals
 
-<!-- domains  -->
-<!--
+# Cloudinary
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
 
-Sr No	 	   Record Id	 	   Name	 	   Destination IP Address	 	   Status
+# Stripe
+STRIPE_SECRET_KEY=sk_test_...
+STRIPE_PUBLISHABLE_KEY=pk_test_...
 
+# JWT & Security
+JWT_SECRET=your-super-secret-jwt-key-minimum-32-characters
+JWT_EXPIRES_IN=7d
+BCRYPT_SALT_ROUNDS=12
 
-1	 	     144739549	 	production-server.tech	 	104.248.17.127	 	Active
+# Email (Gmail)
+EMAIL=your-email@gmail.com
+EMAIL_PASS_KEY=your-app-password
 
+# CORS
+ALLOWED_ORIGINS=http://localhost:3000,https://your-domain.com
+```
 
-2	 	     144739720	 	krelli.production-server.tech	 	104.248.17.127	 	Active
+### Frontend (.env.local)
 
+```env
+NEXT_PUBLIC_API_URL=http://localhost:5000/api
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
+NEXT_PUBLIC_SOCKET_URL=http://localhost:5000
+```
 
-3	 	     144744773	 	yumyum.production-server.tech	 	104.248.17.127	 	Active
+## 📁 Project Structure
 
+```
+property-rentals/
+├── back-end/                 # Express.js API
+│   ├── config/              # Database, Cloudinary, CORS configs
+│   ├── controllers/         # Route handlers
+│   ├── middlewares/         # Auth, error handling, validation
+│   ├── routes/             # API routes
+│   ├── db/                 # Database schema and migrations
+│   ├── socket/             # Socket.io configuration
+│   └── utils/              # Helper functions
+├── front-end/              # Next.js application
+│   ├── src/app/           # App router pages
+│   ├── src/components/    # Reusable components
+│   ├── src/store/         # Zustand store
+│   ├── src/utils/         # Utility functions
+│   └── public/            # Static assets
+└── docker-compose.yml     # Docker orchestration
+```
 
-4	 	     144744807	 	airbnb.production-server.tech	 	104.248.17.127	 	Active
+## 🗄️ Database Schema
 
+### Core Tables
 
-5	 	     144745298	 	krelli1.production-server.tech	 	104.248.17.127	 	Active
+- **users**: User accounts and profiles
+- **properties**: Property listings
+- **property_assets**: Images and videos for properties
+- **categories**: Property categories
+- **features**: Property features/amenities
+- **reviews**: Property ratings and reviews
+- **reservations**: Booking records
+- **chat_rooms**: Real-time messaging
+- **subscribers**: Newsletter subscriptions
 
+## 🔐 API Authentication
 
-6	 	     144745312	 	yumyum1.production-server.tech	 	104.248.17.127	 	Active
+The API uses JWT tokens for authentication. Include the token in the Authorization header:
 
+```javascript
+headers: {
+  'Authorization': `Bearer ${token}`,
+  'Content-Type': 'application/json'
+}
+```
 
-7	 	     144745318	 	swiftbuy.production-server.tech	 	104.248.17.127	 	Active
+## 📡 API Endpoints
 
+### Authentication
 
-8	 	     144745329	 	socialsync.production-server.tech	 	104.248.17.127	 	Active
+- `POST /api/auth/register` - User registration
+- `POST /api/auth/login` - User login
+- `POST /api/auth/refresh` - Refresh token
 
+### Properties
 
-9	 	     144745335	 	swiftbuy1.production-server.tech	 	104.248.17.127	 	Active
+- `GET /api/properties` - List properties with filters
+- `POST /api/properties` - Create new property
+- `GET /api/properties/:id` - Get property details
+- `PUT /api/properties/:id` - Update property
+- `DELETE /api/properties/:id` - Delete property
 
+### Reservations
 
-10	 	     144745348	 	socialsync1.production-server.tech	 	104.248.17.127	 	Active
+- `POST /api/reservations` - Create booking
+- `GET /api/reservations` - Get user bookings
+- `POST /api/stripe/create-checkout-session` - Payment processing
 
+### Real-time Features
 
-11	 	     144745523	 	blog.production-server.tech	 	104.248.17.127	 	Active
+- Socket.io events for messaging
+- Live notifications
+- Real-time booking updates
 
+## 🧪 Testing
 
-12	 	     144745527	 	blog1.production-server.tech	 	104.248.17.127	 	Active
+### Backend Tests
 
+```bash
+cd back-end
+npm test
+```
 
-13	 	     146794868	 	gl.production-server.tech	 	104.248.17.127	 	Active
+### Frontend Tests
 
+```bash
+cd front-end
+npm test
+npm run cypress:open  # E2E tests
+```
 
-14	 	     146794875	 	gl1.production-server.tech	 	104.248.17.127	 	Active
+## 🚀 Deployment
 
+### Production Environment Variables
 
-15	 	     149318607	 	rentals.production-server.tech
- -->
+Ensure all production environment variables are set:
+
+- Database connection strings
+- Cloudinary credentials
+- Stripe production keys
+- Secure JWT secrets
+- Production domain URLs
+
+### Docker Deployment
+
+```bash
+# Build production images
+docker-compose -f docker-compose.prod.yml up -d
+
+# Or deploy to cloud platforms
+# The app is configured for deployment on:
+# - Vercel (Frontend)
+# - Railway/Render (Backend)
+# - Supabase (Database)
+```
+
+### Database Migrations
+
+```bash
+# Run migrations in production
+npm run migrate:prod
+```
+
+## 🔧 Development
+
+### Code Quality
+
+- ESLint and Prettier configured
+- TypeScript strict mode enabled
+- Git hooks for code formatting
+
+### Adding New Features
+
+1. Create feature branch
+2. Add tests for new functionality
+3. Update documentation
+4. Submit pull request
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests and documentation
+5. Submit a pull request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## 🆘 Support
+
+For support and questions:
+
+- Create an issue in the repository
+- Contact: support@estatery.com
+
+## 🔄 Changelog
+
+### v1.0.0
+
+- Initial release with core features
+- Property listing and search functionality
+- User authentication and profiles
+- Payment integration with Stripe
+- Real-time chat system
+- Multi-language support
+
+---
+
+Built with ❤️ by the Estatery Team

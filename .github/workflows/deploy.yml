@@ -1,29 +1,29 @@
-name: Deploy DZ estate App to VPS
+# name: Deploy DZ estate App to VPS
 
-on:
-  push:
-    branches: [main]
-  workflow_dispatch: # Enable manual triggering
+# on:
+#   push:
+#     branches: [main]
+#   workflow_dispatch: # Enable manual triggering
 
-jobs:
-  build:
-    runs-on: self-hosted
-    strategy:
-      matrix:
-        node-version: [18.x] # Use Node.js 18.x
-    steps:
-      - uses: actions/checkout@v2
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node-version }}
-      - name: Deploy to VPS
-        run: |
-          export PATH=$PATH:/usr/bin:/bin:/usr/local/bin:/home/linuxbrew/.linuxbrew/bin
-          cd /home/mohamed/projects/DZ_ESTATE_DEP
-          git pull origin main
-          npm install --prefix back-end
-          npm install --prefix front-end
-          npm run build --prefix front-end
-          pm2 restart frontend
-          pm2 restart backend
+# jobs:
+#   build:
+#     runs-on: self-hosted
+#     strategy:
+#       matrix:
+#         node-version: [18.x] # Use Node.js 18.x
+#     steps:
+#       - uses: actions/checkout@v2
+#       - name: Use Node.js ${{ matrix.node-version }}
+#         uses: actions/setup-node@v1
+#         with:
+#           node-version: ${{ matrix.node-version }}
+#       - name: Deploy to VPS
+#         run: |
+#           export PATH=$PATH:/usr/bin:/bin:/usr/local/bin:/home/linuxbrew/.linuxbrew/bin
+#           cd /home/mohamed/projects/DZ_ESTATE_DEP
+#           git pull origin main
+#           npm install --prefix back-end
+#           npm install --prefix front-end
+#           npm run build --prefix front-end
+#           pm2 restart frontend
+#           pm2 restart backend
